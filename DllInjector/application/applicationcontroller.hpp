@@ -10,8 +10,9 @@ namespace AppSpace
 		Q_OBJECT
 
 	public:
-		ApplicationController()
-			: m_seDebugPrivilege(false)
+		ApplicationController(QObject* parent = nullptr)
+			: QObject(parent)
+			, m_seDebugPrivilege(false)
 		{}
 
 		void setSeDebugPrivilege(bool flag);

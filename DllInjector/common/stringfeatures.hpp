@@ -4,6 +4,7 @@
 #include <locale>
 #include <string>
 #include <cwctype>
+#include <cctype>
 #include <QString>
 
 namespace Common
@@ -17,7 +18,7 @@ namespace Common
 			std::size_t sz = std::wcslen(wideString);
 			std::unique_ptr<char[]> string{ new char[sz + 1] };
 
-			::WideCharToMultiByte(CP_ACP, 0, wideString, -1, string.get(), (int)sz + 1, &defaultCharacter, NULL);
+			::WideCharToMultiByte(CP_ACP, 0, wideString, -1, string.get(), static_cast<int>(sz) + 1, &defaultCharacter, NULL);
 
 			std::string result = string.get();
 			return result;
@@ -29,7 +30,7 @@ namespace Common
 			std::size_t sz = std::wcslen(wideString);
 			std::unique_ptr<char[]> string{ new char[sz + 1] };
 
-			::WideCharToMultiByte(CP_ACP, 0, wideString, -1, string.get(), (int)sz + 1, &defaultCharacter, NULL);
+			::WideCharToMultiByte(CP_ACP, 0, wideString, -1, string.get(), static_cast<int>(sz) + 1, &defaultCharacter, NULL);
 
 			QString result = string.get();
 			return result;
@@ -39,6 +40,7 @@ namespace Common
 		static T toLower(T const& str)
 		{
 			T result = str;
+
 			ToLower<T> transformFunction;
 
 			transformFunction(result);

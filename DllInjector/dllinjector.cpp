@@ -10,12 +10,18 @@ namespace AppSpace
 
 	DllInjector::DllInjector(QWidget *parent)
 		: QMainWindow(parent)
+		, m_selectProcessWindow(new SelectProcess)
+		, m_processesSnapshotModel(new ProcessSnapshotModel(this))
+		, m_appController(new ApplicationController(this))
+	{
+		init();
+	}	
+	
+	void DllInjector::init()
 	{
 		ui.setupUi(this);
 
-		ServiceLocator* serviceLocator = ServiceLocator::instance();
-		serviceLocator->addService<ApplicationController>(new ApplicationController);
-
+		VERIFY(connect(ui.selectProcessButton, SIGNAL(clicked()), m_selectProcessWindow.get(), SLOT(show())));
 		VERIFY(connect(ui.runButton, SIGNAL(clicked()), this, SLOT(slot_RunButtonClicked())));
 	}
 
