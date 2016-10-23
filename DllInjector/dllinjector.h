@@ -1,8 +1,8 @@
 #ifndef DLLINJECTOR_H
 #define DLLINJECTOR_H
 
-#include <QtWidgets/QMainWindow>
 #include "ui_dllinjector.h"
+#include <QtWidgets/QMainWindow>
 
 class DllInjector : public QMainWindow
 {
