@@ -3,17 +3,24 @@
 
 #include "ui_dllinjector.h"
 #include <QtWidgets/QMainWindow>
+#include <QString>
 
-class DllInjector : public QMainWindow
+namespace AppSpace
 {
-	Q_OBJECT
+	class DllInjector : public QMainWindow
+	{
+		Q_OBJECT
 
-public:
-	DllInjector(QWidget *parent = 0);
-	~DllInjector();
+	public:
+		DllInjector(QWidget *parent = nullptr);
 
-private:
-	Ui::DllInjectorClass ui;
-};
+	private Q_SLOTS:
+		void slot_RunButtonClicked();
+		void slot_ShowErrorMessageBox(QString const& str);
+
+	private:
+		Ui::DllInjectorClass ui;
+	};
+}
 
 #endif // DLLINJECTOR_H
