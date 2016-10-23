@@ -21,6 +21,7 @@ namespace AppSpace
 	private Q_SLOTS:
 		void slot_RunButtonClicked();
 		void slot_SelectProcess();
+		void slot_ShowFileDialog();
 
 	private:
 		void init();

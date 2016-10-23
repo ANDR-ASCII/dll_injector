@@ -36,7 +36,7 @@ public:
     {
         if (SelectProcess->objectName().isEmpty())
             SelectProcess->setObjectName(QStringLiteral("SelectProcess"));
-        SelectProcess->setWindowModality(Qt::ApplicationModal);
+        SelectProcess->setWindowModality(Qt::WindowModal);
         SelectProcess->resize(779, 563);
         SelectProcess->setCursor(QCursor(Qt::ArrowCursor));
         QIcon icon;

@@ -21,6 +21,7 @@ namespace AppSpace
 	{
 		ui.setupUi(this);
 
+		m_selectProcessWindow->hide();
 		m_selectProcessWindow->setModel(m_processesSnapshotModel);
 
 		VERIFY(connect(ui.selectProcessButton, SIGNAL(clicked()), m_selectProcessWindow.get(), SLOT(show())));
@@ -28,6 +29,8 @@ namespace AppSpace
 		VERIFY(connect(ui.runButton, SIGNAL(clicked()), this, SLOT(slot_RunButtonClicked())));
 
 		VERIFY(connect(m_selectProcessWindow.get(), SIGNAL(signal_SelectionChanged()), this, SLOT(slot_SelectProcess())));
+
+		VERIFY(connect(ui.selectDllButton, SIGNAL(clicked()), this, SLOT(slot_ShowFileDialog())));
 	}
 	//------------------------------------------------------------------------------
 	void DllInjector::slot_RunButtonClicked()
@@ -52,12 +55,9 @@ namespace AppSpace
 
 		if (createRemoteThreadSelected)
 		{
-			ServiceLocator* serviceLocator = ServiceLocator::instance();
-			ApplicationController* appController = serviceLocator->service<ApplicationController>();
-
 			DWORD selectedPID = m_selectProcessWindow->selectedProcessID();
 
-			appController->createRemoteThread(selectedPID, dllName);
+			m_appController->createRemoteThread(selectedPID, dllName);
 		}
 
 		if (setWindowsHookExSelected)
@@ -89,6 +89,12 @@ namespace AppSpace
 		QString selectedProcessName = m_selectProcessWindow->selectedProcessName();
 
 		ui.processNameLineEdit->setText(QString("[%1] %2").arg(selectedPID).arg(selectedProcessName));
+	}
+	//------------------------------------------------------------------------------
+	void DllInjector::slot_ShowFileDialog()
+	{
+		QString dllName = QFileDialog::getOpenFileName(this, "Select a DLL", "", "*.dll");
+		ui.dllNameLineEdit->setText(dllName);
 	}
 	//------------------------------------------------------------------------------
 }
