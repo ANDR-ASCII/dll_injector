@@ -21,7 +21,6 @@ namespace AppSpace
 	{
 		ui.setupUi(this);
 
-		m_selectProcessWindow->hide();
 		m_selectProcessWindow->setModel(m_processesSnapshotModel);
 
 		VERIFY(connect(ui.selectProcessButton, SIGNAL(clicked()), m_selectProcessWindow.get(), SLOT(show())));
@@ -34,7 +33,9 @@ namespace AppSpace
 	}
 	//------------------------------------------------------------------------------
 	void DllInjector::slot_RunButtonClicked()
-	{
+	{	
+		Disabler disabler(this);
+
 		QString processName = ui.processNameLineEdit->text();
 		QString dllName = ui.dllNameLineEdit->text();
 
@@ -46,6 +47,8 @@ namespace AppSpace
 				QMessageBox::Information
 			);
 
+			Sleep(1000);
+
 			return;
 		}
 
@@ -56,7 +59,6 @@ namespace AppSpace
 		if (createRemoteThreadSelected)
 		{
 			DWORD selectedPID = m_selectProcessWindow->selectedProcessID();
-
 			m_appController->createRemoteThread(selectedPID, dllName);
 		}
 
@@ -81,6 +83,7 @@ namespace AppSpace
 
 			return;
 		}
+
 	}
 	//------------------------------------------------------------------------------
 	void DllInjector::slot_SelectProcess()
