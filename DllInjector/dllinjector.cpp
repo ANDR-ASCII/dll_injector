@@ -21,6 +21,8 @@ namespace AppSpace
 	{
 		ui.setupUi(this);
 
+		m_selectProcessWindow->setModel(m_processesSnapshotModel);
+
 		VERIFY(connect(ui.selectProcessButton, SIGNAL(clicked()), m_selectProcessWindow.get(), SLOT(show())));
 		VERIFY(connect(ui.runButton, SIGNAL(clicked()), this, SLOT(slot_RunButtonClicked())));
 	}
@@ -32,7 +34,12 @@ namespace AppSpace
 
 		if (processName.isEmpty() || dllName.isEmpty())
 		{
-			slot_ShowErrorMessageBox("Process name and DLL name should be specified");
+			showSimpleNotification(
+				"Notification", 
+				"Process name and DLL name should be specified", 
+				QMessageBox::Information
+			);
+
 			return;
 		}
 
@@ -52,23 +59,25 @@ namespace AppSpace
 
 		if (setWindowsHookExSelected)
 		{
-			slot_ShowErrorMessageBox("Method not implemented");
+			showSimpleNotification(
+				"Error",
+				"Method not implemented",
+				QMessageBox::Critical
+			);
+
 			return;
 		}
 
 		if (windowsRegistrySelected)
 		{
-			slot_ShowErrorMessageBox("Method not implemented");
+			showSimpleNotification(
+				"Error",
+				"Method not implemented",
+				QMessageBox::Critical
+			);
+
 			return;
 		}
-	}
-
-	void DllInjector::slot_ShowErrorMessageBox(QString const& message)
-	{
-		QMessageBox errorBox;
-		errorBox.setWindowTitle("Error");
-		errorBox.setText(message);
-		errorBox.exec();
 	}
 
 }

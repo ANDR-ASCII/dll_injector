@@ -14,9 +14,7 @@ namespace AppSpace
 		headerLabels
 			<< "Process name"
 			<< "PID"
-			<< "Parent PID"
-			<< "Threads"
-			<< "Priority base";
+			<< "Priority";
 
 		setHorizontalHeaderLabels(headerLabels);
 		update();
@@ -200,12 +198,6 @@ namespace AppSpace
 
 		case FieldType::PID:
 			return static_cast<int>(m_storage[index.row()].processID);
-
-		case FieldType::ParentPID:
-			return static_cast<int>(m_storage[index.row()].parentProcessID);
-
-		case FieldType::CountThreads:
-			return static_cast<int>(m_storage[index.row()].countThreads);
 
 		case FieldType::PriorityClass:
 			return retrievePriorityClass(m_storage[index.row()].priorityClass);

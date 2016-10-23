@@ -32,7 +32,7 @@ class Ui_DllInjectorClass
 {
 public:
     QWidget *centralWidget;
-    QVBoxLayout *verticalLayout_3;
+    QVBoxLayout *verticalLayout_4;
     QGroupBox *groupBox_2;
     QVBoxLayout *verticalLayout;
     QRadioButton *injectOperation;
@@ -42,6 +42,8 @@ public:
     QRadioButton *createRemoteThreadRadioButton;
     QRadioButton *setWindowsHookExRadioButton;
     QRadioButton *windowsRegistryRadioButton;
+    QGroupBox *groupBox_3;
+    QVBoxLayout *verticalLayout_3;
     QHBoxLayout *horizontalLayout_2;
     QLineEdit *dllNameLineEdit;
     QSpacerItem *horizontalSpacer_5;
@@ -73,10 +75,10 @@ public:
         DllInjectorClass->setStyleSheet(QStringLiteral(""));
         centralWidget = new QWidget(DllInjectorClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
-        verticalLayout_3 = new QVBoxLayout(centralWidget);
-        verticalLayout_3->setSpacing(6);
-        verticalLayout_3->setContentsMargins(11, 11, 11, 11);
-        verticalLayout_3->setObjectName(QStringLiteral("verticalLayout_3"));
+        verticalLayout_4 = new QVBoxLayout(centralWidget);
+        verticalLayout_4->setSpacing(6);
+        verticalLayout_4->setContentsMargins(11, 11, 11, 11);
+        verticalLayout_4->setObjectName(QStringLiteral("verticalLayout_4"));
         groupBox_2 = new QGroupBox(centralWidget);
         groupBox_2->setObjectName(QStringLiteral("groupBox_2"));
         verticalLayout = new QVBoxLayout(groupBox_2);
@@ -95,7 +97,7 @@ public:
         verticalLayout->addWidget(freeOperation);
 
 
-        verticalLayout_3->addWidget(groupBox_2);
+        verticalLayout_4->addWidget(groupBox_2);
 
         groupBox = new QGroupBox(centralWidget);
         groupBox->setObjectName(QStringLiteral("groupBox"));
@@ -121,12 +123,18 @@ public:
         verticalLayout_2->addWidget(windowsRegistryRadioButton);
 
 
-        verticalLayout_3->addWidget(groupBox);
+        verticalLayout_4->addWidget(groupBox);
 
+        groupBox_3 = new QGroupBox(centralWidget);
+        groupBox_3->setObjectName(QStringLiteral("groupBox_3"));
+        verticalLayout_3 = new QVBoxLayout(groupBox_3);
+        verticalLayout_3->setSpacing(6);
+        verticalLayout_3->setContentsMargins(11, 11, 11, 11);
+        verticalLayout_3->setObjectName(QStringLiteral("verticalLayout_3"));
         horizontalLayout_2 = new QHBoxLayout();
         horizontalLayout_2->setSpacing(6);
         horizontalLayout_2->setObjectName(QStringLiteral("horizontalLayout_2"));
-        dllNameLineEdit = new QLineEdit(centralWidget);
+        dllNameLineEdit = new QLineEdit(groupBox_3);
         dllNameLineEdit->setObjectName(QStringLiteral("dllNameLineEdit"));
         dllNameLineEdit->setReadOnly(true);
 
@@ -136,8 +144,9 @@ public:
 
         horizontalLayout_2->addItem(horizontalSpacer_5);
 
-        selectDllButton = new QPushButton(centralWidget);
+        selectDllButton = new QPushButton(groupBox_3);
         selectDllButton->setObjectName(QStringLiteral("selectDllButton"));
+        selectDllButton->setCursor(QCursor(Qt::PointingHandCursor));
 
         horizontalLayout_2->addWidget(selectDllButton);
 
@@ -147,7 +156,7 @@ public:
         horizontalLayout = new QHBoxLayout();
         horizontalLayout->setSpacing(6);
         horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
-        processNameLineEdit = new QLineEdit(centralWidget);
+        processNameLineEdit = new QLineEdit(groupBox_3);
         processNameLineEdit->setObjectName(QStringLiteral("processNameLineEdit"));
         processNameLineEdit->setReadOnly(true);
 
@@ -157,19 +166,23 @@ public:
 
         horizontalLayout->addItem(horizontalSpacer_6);
 
-        selectProcessButton = new QPushButton(centralWidget);
+        selectProcessButton = new QPushButton(groupBox_3);
         selectProcessButton->setObjectName(QStringLiteral("selectProcessButton"));
+        selectProcessButton->setCursor(QCursor(Qt::PointingHandCursor));
 
         horizontalLayout->addWidget(selectProcessButton);
 
 
         verticalLayout_3->addLayout(horizontalLayout);
 
+
+        verticalLayout_4->addWidget(groupBox_3);
+
         textEdit = new QTextEdit(centralWidget);
         textEdit->setObjectName(QStringLiteral("textEdit"));
         textEdit->setReadOnly(true);
 
-        verticalLayout_3->addWidget(textEdit);
+        verticalLayout_4->addWidget(textEdit);
 
         horizontalLayout_3 = new QHBoxLayout();
         horizontalLayout_3->setSpacing(6);
@@ -180,6 +193,15 @@ public:
 
         runButton = new QPushButton(centralWidget);
         runButton->setObjectName(QStringLiteral("runButton"));
+        runButton->setCursor(QCursor(Qt::PointingHandCursor));
+        runButton->setStyleSheet(QLatin1String("QPushButton: \n"
+"{\n"
+"cursor: Pointing Hand;\n"
+"}"));
+        QIcon icon1;
+        icon1.addFile(QStringLiteral("icons/Infect-icon.png"), QSize(), QIcon::Normal, QIcon::Off);
+        runButton->setIcon(icon1);
+        runButton->setIconSize(QSize(30, 30));
 
         horizontalLayout_3->addWidget(runButton);
 
@@ -188,7 +210,7 @@ public:
         horizontalLayout_3->addItem(horizontalSpacer_4);
 
 
-        verticalLayout_3->addLayout(horizontalLayout_3);
+        verticalLayout_4->addLayout(horizontalLayout_3);
 
         DllInjectorClass->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(DllInjectorClass);
@@ -203,7 +225,7 @@ public:
 
     void retranslateUi(QMainWindow *DllInjectorClass)
     {
-        DllInjectorClass->setWindowTitle(QApplication::translate("DllInjectorClass", "DllInjector", 0));
+        DllInjectorClass->setWindowTitle(QApplication::translate("DllInjectorClass", "Dll Injector", 0));
         groupBox_2->setTitle(QApplication::translate("DllInjectorClass", "Select operation", 0));
         injectOperation->setText(QApplication::translate("DllInjectorClass", "Inject DLL", 0));
         freeOperation->setText(QApplication::translate("DllInjectorClass", "Free DLL", 0));
@@ -211,9 +233,13 @@ public:
         createRemoteThreadRadioButton->setText(QApplication::translate("DllInjectorClass", "Inject using CreateRemoteThread", 0));
         setWindowsHookExRadioButton->setText(QApplication::translate("DllInjectorClass", "Inject using SetWindowsHookEx", 0));
         windowsRegistryRadioButton->setText(QApplication::translate("DllInjectorClass", "Inject using Windows registry", 0));
+        groupBox_3->setTitle(QApplication::translate("DllInjectorClass", "Settings", 0));
         selectDllButton->setText(QApplication::translate("DllInjectorClass", "Select DLL", 0));
         selectProcessButton->setText(QApplication::translate("DllInjectorClass", "Select process", 0));
-        runButton->setText(QApplication::translate("DllInjectorClass", "Run", 0));
+#ifndef QT_NO_TOOLTIP
+        runButton->setToolTip(QApplication::translate("DllInjectorClass", "Start operation", 0));
+#endif // QT_NO_TOOLTIP
+        runButton->setText(QString());
     } // retranslateUi
 
 };

@@ -20,7 +20,6 @@ namespace AppSpace
 
 	private Q_SLOTS:
 		void slot_RunButtonClicked();
-		void slot_ShowErrorMessageBox(QString const& str);
 
 	private:
 		void init();

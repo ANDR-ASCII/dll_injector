@@ -36,11 +36,13 @@ public:
     {
         if (SelectProcess->objectName().isEmpty())
             SelectProcess->setObjectName(QStringLiteral("SelectProcess"));
-        SelectProcess->setWindowModality(Qt::WindowModal);
-        SelectProcess->resize(400, 300);
+        SelectProcess->setWindowModality(Qt::ApplicationModal);
+        SelectProcess->resize(779, 563);
+        SelectProcess->setCursor(QCursor(Qt::ArrowCursor));
         QIcon icon;
         icon.addFile(QStringLiteral("../icons/Malware-icon.png"), QSize(), QIcon::Normal, QIcon::Off);
         SelectProcess->setWindowIcon(icon);
+        SelectProcess->setStyleSheet(QStringLiteral("font: 10pt \"MS Shell Dlg 2\";"));
         verticalLayout = new QVBoxLayout(SelectProcess);
         verticalLayout->setSpacing(6);
         verticalLayout->setContentsMargins(11, 11, 11, 11);
@@ -59,6 +61,7 @@ public:
 
         selectButton = new QPushButton(SelectProcess);
         selectButton->setObjectName(QStringLiteral("selectButton"));
+        selectButton->setCursor(QCursor(Qt::PointingHandCursor));
 
         horizontalLayout->addWidget(selectButton);
 

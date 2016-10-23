@@ -124,4 +124,7 @@
       <Filter>Form Files</Filter>
     </CustomBuild>
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="icons\Malware-icon.png" />
+  </ItemGroup>
 </Project>

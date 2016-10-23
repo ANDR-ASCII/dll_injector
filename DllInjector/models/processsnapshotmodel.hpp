@@ -37,8 +37,6 @@ namespace AppSpace
 		{
 			  Name
 			, PID
-			, ParentPID
-			, CountThreads
 			, PriorityClass
 		};
 
