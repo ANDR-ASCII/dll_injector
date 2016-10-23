@@ -42,7 +42,72 @@ public:
         QIcon icon;
         icon.addFile(QStringLiteral("../icons/Malware-icon.png"), QSize(), QIcon::Normal, QIcon::Off);
         SelectProcess->setWindowIcon(icon);
-        SelectProcess->setStyleSheet(QStringLiteral("font: 10pt \"MS Shell Dlg 2\";"));
+        SelectProcess->setStyleSheet(QLatin1String("QTreeView {\n"
+"    show-decoration-selected: 1;\n"
+"    border-radius: 5px;\n"
+"    padding: 1px;\n"
+"    border: 1px solid rgb(170, 170, 170);\n"
+"}\n"
+"\n"
+"QTreeView::item {\n"
+"     border: 1px solid rgb(170, 170, 170);\n"
+"     border-top-color: transparent;\n"
+"     border-bottom-color: transparent;\n"
+"}\n"
+"\n"
+"QTreeView::item:hover {\n"
+"    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #e7effd, stop: 1 #cbdaf1);\n"
+"    border: 1px solid #bfcde4;\n"
+"}\n"
+"\n"
+"QTreeView::item:selected {\n"
+"    border: 1px solid #567dbc;\n"
+"}\n"
+"\n"
+"QTreeView::item:selected:active{\n"
+"    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #6ea1f1, stop: 1 #567dbc);\n"
+"}\n"
+"\n"
+"QTreeView::item:selected:!active {\n"
+"    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #6b9be8, stop: 1 #577fbf);\n"
+"}\n"
+"\n"
+"QTreeView::branch {\n"
+"        background: palette(base);\n"
+"}\n"
+"\n"
+"QTreeView::branch:has-siblings:!adjoins-item {\n"
+"        background: cyan;\n"
+"}"
+                        "\n"
+"\n"
+"QTreeView::branch:closed:has-children:has-siblings {\n"
+"        background: pink;\n"
+"}\n"
+"\n"
+"QTreeView::branch:has-children:!has-siblings:closed {\n"
+"        background: gray;\n"
+"}\n"
+"\n"
+"QTreeView::branch:open:has-children:has-siblings {\n"
+"        background: magenta;\n"
+"}\n"
+"\n"
+"QTreeView::branch:open:has-children:!has-siblings {\n"
+"        background: green;\n"
+"}\n"
+"\n"
+"QPushButton\n"
+"{\n"
+"background-color: rgb(225, 225, 225);\n"
+"color: black;\n"
+"border-radius: 5px;\n"
+"border: 1px solid;\n"
+"border-color: rgb(170, 170, 170);\n"
+"padding: 7px;\n"
+"}\n"
+"\n"
+"font: 10pt \"MS Shell Dlg 2\";"));
         verticalLayout = new QVBoxLayout(SelectProcess);
         verticalLayout->setSpacing(6);
         verticalLayout->setContentsMargins(11, 11, 11, 11);
@@ -62,6 +127,7 @@ public:
         selectButton = new QPushButton(SelectProcess);
         selectButton->setObjectName(QStringLiteral("selectButton"));
         selectButton->setCursor(QCursor(Qt::PointingHandCursor));
+        selectButton->setStyleSheet(QStringLiteral(""));
 
         horizontalLayout->addWidget(selectButton);
 

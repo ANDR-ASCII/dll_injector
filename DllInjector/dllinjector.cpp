@@ -55,9 +55,9 @@ namespace AppSpace
 			ServiceLocator* serviceLocator = ServiceLocator::instance();
 			ApplicationController* appController = serviceLocator->service<ApplicationController>();
 
+			DWORD selectedPID = m_selectProcessWindow->selectedProcessID();
 
-
-			//appController->createRemoteThread(processName, dllName);
+			appController->createRemoteThread(selectedPID, dllName);
 		}
 
 		if (setWindowsHookExSelected)

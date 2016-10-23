@@ -67,7 +67,7 @@ namespace AppSpace
 
 		if (role == Qt::DecorationRole && index.column() == FieldType::Name)
 		{
-			static QIcon icon("icons/process-accept-icon.png");
+			static QIcon icon("icons/CPU-Intel-icon.png");
 			return icon;
 		}
 
