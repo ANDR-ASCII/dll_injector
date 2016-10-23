@@ -35,6 +35,11 @@ namespace AppSpace
 		return m_selectedPid;
 	}
 
+	QString const& SelectProcess::selectedProcessName() const
+	{
+		return m_selectedProcessName;
+	}
+
 	void SelectProcess::slot_SelectProcess()
 	{
 		QItemSelectionModel* selectionModel = ui.processView->selectionModel();
@@ -68,6 +73,10 @@ namespace AppSpace
 			int row = modelIndexes.back().row();
 
 			m_selectedPid = static_cast<DWORD>(model->getValue(row, ProcessSnapshotModel::PID).toInt());
+			m_selectedProcessName = model->getValue(row, ProcessSnapshotModel::Name).toString();
+
+			this->hide();
+			emit signal_SelectionChanged();
 		}
 		else
 		{

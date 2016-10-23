@@ -16,6 +16,10 @@ namespace AppSpace
 		QAbstractItemModel* model() const;
 
 		DWORD selectedProcessID() const;
+		QString const& selectedProcessName() const;
+
+	Q_SIGNALS:
+		void signal_SelectionChanged();
 
 	private Q_SLOTS:
 		void slot_SelectProcess();
@@ -26,5 +30,6 @@ namespace AppSpace
 	private:
 		Ui::SelectProcess ui;
 		DWORD m_selectedPid;
+		QString m_selectedProcessName;
 	};
 }

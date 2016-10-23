@@ -7,7 +7,7 @@
 namespace AppSpace
 {
 	using namespace Common;
-
+	//------------------------------------------------------------------------------
 	DllInjector::DllInjector(QWidget *parent)
 		: QMainWindow(parent)
 		, m_selectProcessWindow(new SelectProcess)
@@ -16,7 +16,7 @@ namespace AppSpace
 	{
 		init();
 	}	
-	
+	//------------------------------------------------------------------------------
 	void DllInjector::init()
 	{
 		ui.setupUi(this);
@@ -24,9 +24,12 @@ namespace AppSpace
 		m_selectProcessWindow->setModel(m_processesSnapshotModel);
 
 		VERIFY(connect(ui.selectProcessButton, SIGNAL(clicked()), m_selectProcessWindow.get(), SLOT(show())));
-		VERIFY(connect(ui.runButton, SIGNAL(clicked()), this, SLOT(slot_RunButtonClicked())));
-	}
 
+		VERIFY(connect(ui.runButton, SIGNAL(clicked()), this, SLOT(slot_RunButtonClicked())));
+
+		VERIFY(connect(m_selectProcessWindow.get(), SIGNAL(signal_SelectionChanged()), this, SLOT(slot_SelectProcess())));
+	}
+	//------------------------------------------------------------------------------
 	void DllInjector::slot_RunButtonClicked()
 	{
 		QString processName = ui.processNameLineEdit->text();
@@ -79,5 +82,13 @@ namespace AppSpace
 			return;
 		}
 	}
+	//------------------------------------------------------------------------------
+	void DllInjector::slot_SelectProcess()
+	{
+		DWORD selectedPID = m_selectProcessWindow->selectedProcessID();
+		QString selectedProcessName = m_selectProcessWindow->selectedProcessName();
 
+		ui.processNameLineEdit->setText(QString("[%1] %2").arg(selectedPID).arg(selectedProcessName));
+	}
+	//------------------------------------------------------------------------------
 }

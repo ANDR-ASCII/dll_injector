@@ -48,10 +48,12 @@ public:
     QLineEdit *dllNameLineEdit;
     QSpacerItem *horizontalSpacer_5;
     QPushButton *selectDllButton;
+    QSpacerItem *horizontalSpacer_2;
     QHBoxLayout *horizontalLayout;
     QLineEdit *processNameLineEdit;
     QSpacerItem *horizontalSpacer_6;
     QPushButton *selectProcessButton;
+    QSpacerItem *horizontalSpacer;
     QTextEdit *textEdit;
     QHBoxLayout *horizontalLayout_3;
     QSpacerItem *horizontalSpacer_3;
@@ -72,7 +74,31 @@ public:
         QIcon icon;
         icon.addFile(QStringLiteral("icons/Malware-icon.png"), QSize(), QIcon::Normal, QIcon::Off);
         DllInjectorClass->setWindowIcon(icon);
-        DllInjectorClass->setStyleSheet(QStringLiteral(""));
+        DllInjectorClass->setStyleSheet(QLatin1String("QPushButton\n"
+"{\n"
+"background-color: rgb(225, 225, 225);\n"
+"color: black;\n"
+"border-radius: 5px;\n"
+"border: 1px solid;\n"
+"border-color: rgb(170, 170, 170);\n"
+"padding: 7px;\n"
+"}\n"
+"\n"
+"QGroupBox\n"
+"{\n"
+"border-radius: 5px;\n"
+"border: 1px solid;\n"
+"border-color: rgb(170, 170, 170);\n"
+"padding: 8px;\n"
+"}\n"
+"\n"
+"QTextEdit\n"
+"{\n"
+"border-radius: 5px;\n"
+"border: 1px solid;\n"
+"border-color: rgb(170, 170, 170);\n"
+"padding: 1px;\n"
+"}"));
         centralWidget = new QWidget(DllInjectorClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         verticalLayout_4 = new QVBoxLayout(centralWidget);
@@ -81,6 +107,7 @@ public:
         verticalLayout_4->setObjectName(QStringLiteral("verticalLayout_4"));
         groupBox_2 = new QGroupBox(centralWidget);
         groupBox_2->setObjectName(QStringLiteral("groupBox_2"));
+        groupBox_2->setStyleSheet(QStringLiteral(""));
         verticalLayout = new QVBoxLayout(groupBox_2);
         verticalLayout->setSpacing(6);
         verticalLayout->setContentsMargins(11, 11, 11, 11);
@@ -101,6 +128,7 @@ public:
 
         groupBox = new QGroupBox(centralWidget);
         groupBox->setObjectName(QStringLiteral("groupBox"));
+        groupBox->setMouseTracking(false);
         groupBox->setStyleSheet(QStringLiteral(""));
         verticalLayout_2 = new QVBoxLayout(groupBox);
         verticalLayout_2->setSpacing(6);
@@ -127,6 +155,13 @@ public:
 
         groupBox_3 = new QGroupBox(centralWidget);
         groupBox_3->setObjectName(QStringLiteral("groupBox_3"));
+        groupBox_3->setStyleSheet(QLatin1String("QLineEdit\n"
+"{\n"
+"border-radius: 8px;\n"
+"border: 1px solid rgb(220, 220, 220);\n"
+"width: 250px;\n"
+"height: 30px;\n"
+"};"));
         verticalLayout_3 = new QVBoxLayout(groupBox_3);
         verticalLayout_3->setSpacing(6);
         verticalLayout_3->setContentsMargins(11, 11, 11, 11);
@@ -136,6 +171,7 @@ public:
         horizontalLayout_2->setObjectName(QStringLiteral("horizontalLayout_2"));
         dllNameLineEdit = new QLineEdit(groupBox_3);
         dllNameLineEdit->setObjectName(QStringLiteral("dllNameLineEdit"));
+        dllNameLineEdit->setStyleSheet(QStringLiteral(""));
         dllNameLineEdit->setReadOnly(true);
 
         horizontalLayout_2->addWidget(dllNameLineEdit);
@@ -150,6 +186,10 @@ public:
 
         horizontalLayout_2->addWidget(selectDllButton);
 
+        horizontalSpacer_2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+        horizontalLayout_2->addItem(horizontalSpacer_2);
+
 
         verticalLayout_3->addLayout(horizontalLayout_2);
 
@@ -158,6 +198,7 @@ public:
         horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
         processNameLineEdit = new QLineEdit(groupBox_3);
         processNameLineEdit->setObjectName(QStringLiteral("processNameLineEdit"));
+        processNameLineEdit->setStyleSheet(QStringLiteral(""));
         processNameLineEdit->setReadOnly(true);
 
         horizontalLayout->addWidget(processNameLineEdit);
@@ -171,6 +212,10 @@ public:
         selectProcessButton->setCursor(QCursor(Qt::PointingHandCursor));
 
         horizontalLayout->addWidget(selectProcessButton);
+
+        horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+        horizontalLayout->addItem(horizontalSpacer);
 
 
         verticalLayout_3->addLayout(horizontalLayout);
