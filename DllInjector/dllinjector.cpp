@@ -30,6 +30,10 @@ namespace AppSpace
 		VERIFY(connect(m_selectProcessWindow.get(), SIGNAL(signal_SelectionChanged()), this, SLOT(slot_SelectProcess())));
 
 		VERIFY(connect(ui.selectDllButton, SIGNAL(clicked()), this, SLOT(slot_ShowFileDialog())));
+
+		VERIFY(connect(m_appController, SIGNAL(signal_OnAboutLog(QString)), this, SLOT(slot_OnAboutLogActions(QString))));
+
+		m_appController->setSeDebugPrivilege(true);
 	}
 	//------------------------------------------------------------------------------
 	void DllInjector::slot_RunButtonClicked()
@@ -46,8 +50,6 @@ namespace AppSpace
 				"Process name and DLL name should be specified", 
 				QMessageBox::Information
 			);
-
-			Sleep(1000);
 
 			return;
 		}
@@ -99,5 +101,11 @@ namespace AppSpace
 		QString dllName = QFileDialog::getOpenFileName(this, "Select a DLL", "", "*.dll");
 		ui.dllNameLineEdit->setText(dllName);
 	}
+
+	void DllInjector::slot_OnAboutLogActions(QString str)
+	{
+		ui.textEdit->append(str);
+	}
+
 	//------------------------------------------------------------------------------
 }

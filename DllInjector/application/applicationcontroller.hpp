@@ -19,10 +19,11 @@ namespace AppSpace
 		bool seDebugPrivilege() const;
 
 		// first injection method
-		bool createRemoteThread(DWORD pid, QString const& dllName);
+		void createRemoteThread(DWORD pid, QString const& pathToDll);
 
 	Q_SIGNALS:
 		void signal_OnError(QString);
+		void signal_OnAboutLog(QString);
 
 	private:
 		bool m_seDebugPrivilege;

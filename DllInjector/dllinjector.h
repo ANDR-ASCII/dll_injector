@@ -22,6 +22,7 @@ namespace AppSpace
 		void slot_RunButtonClicked();
 		void slot_SelectProcess();
 		void slot_ShowFileDialog();
+		void slot_OnAboutLogActions(QString str);
 
 	private:
 		void init();
