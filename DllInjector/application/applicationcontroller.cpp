@@ -187,7 +187,7 @@ namespace AppSpace
 		::GetNativeSystemInfo(&sysInfo);
 
 		assert(sysInfo.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_INTEL ||
-			sysInfo.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_INTEL);
+			sysInfo.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_AMD64);
 
 		if (sysInfo.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_INTEL)
 		{
