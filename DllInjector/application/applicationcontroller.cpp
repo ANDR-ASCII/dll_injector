@@ -1,11 +1,13 @@
 #include "stdafx.h"
 #include "applicationcontroller.hpp"
+#include "common/common.hpp"
+#include <fstream>
+#include <cstdint>
 #include <windows.h>
 #include <winbase.h>
 
 namespace AppSpace
 {
-
 	void ApplicationController::setSeDebugPrivilege(bool flag)
 	{
 		HANDLE hThisProcess = ::GetCurrentProcess();
@@ -54,7 +56,7 @@ namespace AppSpace
 	{
 		emit signal_OnAboutLog(QString(80, '-'));
 
-		HANDLE hInjectingProcess = ::OpenProcess(
+		Common::Win32::HandleRAIIWrapper injectingProcess = ::OpenProcess(
 			PROCESS_CREATE_THREAD |
 			PROCESS_QUERY_INFORMATION |
 			PROCESS_VM_OPERATION |
@@ -64,9 +66,17 @@ namespace AppSpace
 			pid
 		);
 
-		if (hInjectingProcess == nullptr)
+		if (!injectingProcess)
 		{
 			emit signal_OnAboutLog(QString("OpenProcess fails with: %1").arg(::GetLastError()));
+			emit signal_OnAboutLog(QString(80, '-'));
+			return;
+		}
+
+		if (checkImageFileState(pathToDll) == ImageFileState::X64 &&
+			processRunningUnderWOW64(injectingProcess))
+		{
+			emit signal_OnAboutLog("Error: different bitness of DLLs and injecting process...");
 			emit signal_OnAboutLog(QString(80, '-'));
 			return;
 		}
@@ -76,7 +86,7 @@ namespace AppSpace
 		std::wstring path = pathToDll.toStdWString();
 
 		LPVOID ptrToString = 
-			::VirtualAllocEx(hInjectingProcess, nullptr, (path.size() + 1) * sizeof(wchar_t), MEM_COMMIT, PAGE_READWRITE);
+			::VirtualAllocEx(injectingProcess, nullptr, (path.size() + 1) * sizeof(wchar_t), MEM_COMMIT, PAGE_READWRITE);
 
 		if (!ptrToString)
 		{
@@ -87,7 +97,7 @@ namespace AppSpace
 
 		emit signal_OnAboutLog("Memory for 'path to dll' string allocated to the specified process...");
 
-		if (!::WriteProcessMemory(hInjectingProcess, ptrToString, path.c_str(), (path.size() + 1) * sizeof(wchar_t), nullptr))
+		if (!::WriteProcessMemory(injectingProcess, ptrToString, path.c_str(), (path.size() + 1) * sizeof(wchar_t), nullptr))
 		{
 			emit signal_OnAboutLog(QString("WriteProcessMemory fails with: %1").arg(::GetLastError()));
 			emit signal_OnAboutLog(QString(80, '-'));
@@ -101,22 +111,90 @@ namespace AppSpace
 
 		emit signal_OnAboutLog("Injecting...");
 
-		HANDLE hRemoteThread = ::CreateRemoteThread(hInjectingProcess, nullptr, 0, startRoutine, ptrToString, 0, nullptr);
+		Common::Win32::HandleRAIIWrapper remoteThread = 
+			::CreateRemoteThread(injectingProcess, nullptr, 0, startRoutine, ptrToString, 0, nullptr);
 
-		if (hRemoteThread == nullptr)
+		if (!remoteThread)
 		{
 			emit signal_OnAboutLog(QString("CreateRemoteThread fails with: %1").arg(::GetLastError()));
 			emit signal_OnAboutLog(QString(80, '-'));
 			return;
 		}
 
-		::WaitForSingleObject(hRemoteThread, INFINITE);
-		
-		::CloseHandle(hRemoteThread);
-		::CloseHandle(hInjectingProcess);
+		::WaitForSingleObject(remoteThread, INFINITE);
 
 		emit signal_OnAboutLog(QString("DLL was successful injected by %1 address!"));
 		emit signal_OnAboutLog(QString(80, '-'));
+	}
+
+	AppSpace::ApplicationController::ImageFileState ApplicationController::checkImageFileState(QString const& imageFile) const
+	{
+		IMAGE_DOS_HEADER imageDOSHeader;
+		IMAGE_FILE_HEADER imageFileHeader;
+		std::uint32_t peSignature = 0;
+		std::uint16_t bitOfImageFile = 0;
+
+		std::ifstream imageFileStream(imageFile.toStdString(), std::ios_base::binary);
+
+		if (!imageFileStream)
+		{
+			return ImageFileState::ErrorSpecifiedImageFileDoesNotExists;
+		}
+
+		imageFileStream.read(reinterpret_cast<char*>(&imageDOSHeader), sizeof(imageDOSHeader));
+
+		// Check signature of each image file
+		if (imageDOSHeader.e_magic != 0x5A4D)
+		{
+			return ImageFileState::ErrorInvalidDOSSignature;
+		}
+
+		// go to the first byte of NT header
+		imageFileStream.seekg(static_cast<std::streampos>(imageDOSHeader.e_lfanew));
+		imageFileStream.read(reinterpret_cast<char*>(&peSignature), sizeof(peSignature));
+
+		if (peSignature != 0x00004550)
+		{
+			return ImageFileState::ErrorInvalidPESignature;
+		}
+
+		imageFileStream.read(reinterpret_cast<char*>(&imageFileHeader), sizeof(imageFileHeader));
+
+		if (imageFileHeader.SizeOfOptionalHeader == 0)
+		{
+			return ImageFileState::ErrorInvalidOptionalHeaderSize;
+		}
+		
+		if (imageFileHeader.Machine == IMAGE_FILE_MACHINE_I386)
+		{
+			return ImageFileState::X32;
+		}
+
+		if (imageFileHeader.Machine == IMAGE_FILE_MACHINE_AMD64)
+		{
+			return ImageFileState::X64;
+		}
+
+		return ImageFileState::ErrorUndefinedBitOfImageFile;
+	}
+
+	bool ApplicationController::processRunningUnderWOW64(HANDLE hProcess) const
+	{
+		BOOL bResult = FALSE;
+		SYSTEM_INFO sysInfo;
+
+		::IsWow64Process(hProcess, &bResult);
+		::GetNativeSystemInfo(&sysInfo);
+
+		assert(sysInfo.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_INTEL ||
+			sysInfo.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_INTEL);
+
+		if (sysInfo.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_INTEL)
+		{
+			return false;
+		}
+
+		return bResult;
 	}
 
 }

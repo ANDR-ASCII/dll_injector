@@ -10,6 +10,17 @@ namespace AppSpace
 		Q_OBJECT
 
 	public:
+		enum ImageFileState
+		{
+			  ErrorInvalidDOSSignature
+			, ErrorInvalidPESignature
+			, ErrorInvalidOptionalHeaderSize
+			, ErrorSpecifiedImageFileDoesNotExists
+			, ErrorUndefinedBitOfImageFile
+			, X32
+			, X64
+		};
+
 		ApplicationController(QObject* parent = nullptr)
 			: QObject(parent)
 			, m_seDebugPrivilege(false)
@@ -20,6 +31,11 @@ namespace AppSpace
 
 		// first injection method
 		void createRemoteThread(DWORD pid, QString const& pathToDll);
+
+		// this function determines whether passed file pe32 or pe32+
+		ImageFileState checkImageFileState(QString const& imageFile) const;
+
+		bool processRunningUnderWOW64(HANDLE hProcess) const;
 
 	Q_SIGNALS:
 		void signal_OnError(QString);
