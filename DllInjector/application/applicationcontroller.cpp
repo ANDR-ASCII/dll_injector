@@ -56,7 +56,7 @@ namespace AppSpace
 	{
 		emit signal_OnAboutLog(QString(80, '-'));
 
-		Common::Win32::HandleRAIIWrapper injectingProcess = ::OpenProcess(
+		Common::Win32::Handle injectingProcess = ::OpenProcess(
 			PROCESS_CREATE_THREAD |
 			PROCESS_QUERY_INFORMATION |
 			PROCESS_VM_OPERATION |
@@ -76,7 +76,7 @@ namespace AppSpace
 		if (checkImageFileState(pathToDll) == ImageFileState::X64 &&
 			processRunningUnderWOW64(injectingProcess))
 		{
-			emit signal_OnAboutLog("Error: different bitness of DLLs and injecting process...");
+			emit signal_OnAboutLog("Error: different bits of DLLs and injecting process...");
 			emit signal_OnAboutLog(QString(80, '-'));
 			return;
 		}
@@ -111,7 +111,7 @@ namespace AppSpace
 
 		emit signal_OnAboutLog("Injecting...");
 
-		Common::Win32::HandleRAIIWrapper remoteThread = 
+		Common::Win32::Handle remoteThread = 
 			::CreateRemoteThread(injectingProcess, nullptr, 0, startRoutine, ptrToString, 0, nullptr);
 
 		if (!remoteThread)

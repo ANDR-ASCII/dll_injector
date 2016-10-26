@@ -22,22 +22,22 @@ namespace Common
 
 	namespace Win32
 	{
-		class HandleRAIIWrapper
+		class Handle
 		{
 		public:
-			HandleRAIIWrapper(HANDLE handle)
+			Handle(HANDLE handle)
 				: m_handle(handle)
 			{}
 
-			HandleRAIIWrapper(HandleRAIIWrapper const&) = delete;
+			Handle(Handle const&) = delete;
 
-			HandleRAIIWrapper(HandleRAIIWrapper&& other)
+			Handle(Handle&& other)
 				: m_handle(std::move(other.m_handle))
 			{
 				other.m_handle = nullptr;
 			}
 
-			~HandleRAIIWrapper()
+			~Handle()
 			{
 				closeHandle();
 			}
@@ -47,7 +47,7 @@ namespace Common
 				return m_handle;
 			}
 
-			HandleRAIIWrapper& operator=(HandleRAIIWrapper const& other)
+			Handle& operator=(Handle const& other)
 			{
 				closeHandle();
 
