@@ -127,7 +127,7 @@ namespace AppSpace
 		emit signal_OnAboutLog(QString(80, '-'));
 	}
 
-	AppSpace::ApplicationController::ImageFileState ApplicationController::checkImageFileState(QString const& imageFile) const
+	ApplicationController::ImageFileState ApplicationController::checkImageFileState(QString const& imageFile) const
 	{
 		IMAGE_DOS_HEADER imageDOSHeader;
 		IMAGE_FILE_HEADER imageFileHeader;

@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "ui_selectprocess.h"
+#include "models/processsnapshotmodel.hpp"
 #include <QWidget>
 #include <windows.h>
 
@@ -12,7 +13,6 @@ namespace AppSpace
 	public:
 		SelectProcess(QWidget * parent = nullptr);
 
-		void setModel(QAbstractTableModel* model);
 		QAbstractItemModel* model() const;
 
 		DWORD selectedProcessID() const;
@@ -31,5 +31,6 @@ namespace AppSpace
 		Ui::SelectProcess ui;
 		DWORD m_selectedPid;
 		QString m_selectedProcessName;
+		ProcessSnapshotModel* m_model;
 	};
 }

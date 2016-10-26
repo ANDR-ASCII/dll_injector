@@ -7,7 +7,9 @@ namespace AppSpace
 {
 	using namespace Common;
 
-	SelectProcess::SelectProcess(QWidget * parent) : QWidget(parent)
+	SelectProcess::SelectProcess(QWidget * parent) 
+		: QWidget(parent)
+		, m_model(new ProcessSnapshotModel(this))
 	{
 		init();
 	}
@@ -15,14 +17,10 @@ namespace AppSpace
 	void SelectProcess::init()
 	{
 		ui.setupUi(this);
+		ui.processView->setModel(m_model);
 		ui.processView->setAlternatingRowColors(true);
 
 		VERIFY(connect(ui.selectButton, SIGNAL(clicked()), this, SLOT(slot_SelectProcess())));
-	}
-
-	void SelectProcess::setModel(QAbstractTableModel* model)
-	{
-		ui.processView->setModel(model);
 	}
 
 	QAbstractItemModel* SelectProcess::model() const

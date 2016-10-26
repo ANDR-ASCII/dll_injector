@@ -49,7 +49,6 @@ namespace AppSpace
 	private:
 		Ui::DllInjectorClass ui;
 		std::unique_ptr<SelectProcess> m_selectProcessWindow;
-		ProcessSnapshotModel* m_processesSnapshotModel;
 		ApplicationController* m_appController;
 	};
 }

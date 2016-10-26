@@ -11,7 +11,6 @@ namespace AppSpace
 	DllInjector::DllInjector(QWidget *parent)
 		: QMainWindow(parent)
 		, m_selectProcessWindow(new SelectProcess)
-		, m_processesSnapshotModel(new ProcessSnapshotModel(this))
 		, m_appController(new ApplicationController(this))
 	{
 		init();
@@ -20,8 +19,6 @@ namespace AppSpace
 	void DllInjector::init()
 	{
 		ui.setupUi(this);
-
-		m_selectProcessWindow->setModel(m_processesSnapshotModel);
 
 		VERIFY(connect(ui.selectProcessButton, SIGNAL(clicked()), m_selectProcessWindow.get(), SLOT(show())));
 
