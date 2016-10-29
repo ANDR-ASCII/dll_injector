@@ -51,33 +51,36 @@ public:
 		: m_openFlag(false)
 		, m_openedThisProcess(false)
 	{}
-	//-------------------------------------------------------------------------------------------------------
+
 	Process(Injector::ILogger* logger)
 		: m_logger(logger)
 		, m_openFlag(false)
 		, m_openedThisProcess(false)
 	{}
-	//-------------------------------------------------------------------------------------------------------
+
+	Process(Process const&&) = delete;
+	Process(Process&&) = delete;
+
 	~Process()
 	{
 		close();
 	}
-	//-------------------------------------------------------------------------------------------------------
+
 	operator bool() const
 	{
 		return m_openFlag;
 	}
-	//-------------------------------------------------------------------------------------------------------
+	
 	HANDLE get() const
 	{
 		return m_handle;
 	}
-	//-------------------------------------------------------------------------------------------------------
+
 	void setLogger(Injector::ILogger const* logger)
 	{
 		m_logger = logger;
 	}
-	//-------------------------------------------------------------------------------------------------------
+
 	bool open(DWORD pid, DWORD desiredAccess)
 	{
 		if (m_openFlag)
@@ -104,7 +107,7 @@ public:
 
 		return m_openFlag;
 	}
-	//-------------------------------------------------------------------------------------------------------
+
 	void close()
 	{
 		if (m_openFlag)
@@ -113,7 +116,7 @@ public:
 			::CloseHandle(m_handle);
 		}
 	}
-	//-------------------------------------------------------------------------------------------------------
+
 	LPVOID virtualAlloc(LPVOID address, SIZE_T sizeofBytes, DWORD allocationType, DWORD pageProtect) const
 	{
 		assert(m_openFlag);
@@ -135,7 +138,7 @@ public:
 
 		return allocAddress;
 	}
-	//-------------------------------------------------------------------------------------------------------
+
 	bool writeProcessMemory(LPVOID baseAddress, LPCVOID buffer, SIZE_T sizeofBytes) const
 	{
 		assert(m_openFlag);
@@ -161,7 +164,7 @@ public:
 
 		return bResult;
 	}
-	//-------------------------------------------------------------------------------------------------------
+
 	Thread createThread(LPSECURITY_ATTRIBUTES securityAttributes, 
 		SIZE_T stackSize, 
 		LPTHREAD_START_ROUTINE startAddress, 
@@ -217,13 +220,13 @@ private:
 			(*m_logger)(log);
 		}
 	}
-	//-------------------------------------------------------------------------------------------------------
+
 	void resetFlags()
 	{
 		m_openFlag = false;
 		m_openedThisProcess = false;
 	}
-	//-------------------------------------------------------------------------------------------------------
+
 	template <typename F, typename... Args>
 	Thread createThreadInternal(F* f, Args&&... args) const
 	{
@@ -231,7 +234,7 @@ private:
 
 		return f(std::forward<Args>(args)...);
 	}
-	//-------------------------------------------------------------------------------------------------------
+
 private:
 	HANDLE m_handle;
 

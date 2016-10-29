@@ -162,22 +162,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="application\applicationcontroller.cpp" />
-    <ClCompile Include="GeneratedFiles\Debug\moc_applicationcontroller.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_mainframe.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_processsnapshotmodel.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_selectprocess.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_applicationcontroller.cpp" />
+    <ClCompile Include="GeneratedFiles\Debug\moc_mainframe.cpp" />
+    <ClCompile Include="GeneratedFiles\Debug\moc_processsnapshotmodel.cpp" />
+    <ClCompile Include="GeneratedFiles\Debug\moc_selectprocess.cpp" />
     <ClCompile Include="GeneratedFiles\qrc_mainframe.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </PrecompiledHeader>
@@ -188,22 +176,10 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
       </PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_applicationcontroller.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_mainframe.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_processsnapshotmodel.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_selectprocess.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_applicationcontroller.cpp" />
+    <ClCompile Include="GeneratedFiles\Release\moc_mainframe.cpp" />
+    <ClCompile Include="GeneratedFiles\Release\moc_processsnapshotmodel.cpp" />
+    <ClCompile Include="GeneratedFiles\Release\moc_selectprocess.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="models\processsnapshotmodel.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -240,8 +216,6 @@
     <ClInclude Include="common\servicelocator.h" />
     <ClInclude Include="common\stringfeatures.h" />
     <ClInclude Include="common\winapihelpers.h" />
-    <ClInclude Include="GeneratedFiles\ui_mainframe.h" />
-    <ClInclude Include="GeneratedFiles\ui_selectprocess.h" />
     <CustomBuild Include="widgets\selectprocess.h">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath);$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Moc%27ing selectprocess.h...</Message>
@@ -296,6 +270,8 @@
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp" "-fstdafx.h" "-f../../application/applicationcontroller.h"  -DUNICODE -DWIN32 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtWidgets" "-I.\application" "-I.\models" "-I.\common" "-I.\windows"</Command>
     </CustomBuild>
+    <ClInclude Include="GeneratedFiles\ui_mainframe.h" />
+    <ClInclude Include="GeneratedFiles\ui_selectprocess.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
