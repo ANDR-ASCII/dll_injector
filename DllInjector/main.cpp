@@ -1,11 +1,10 @@
 #include "stdafx.h"
-#include "dllinjector.h"
+#include "widgets/mainframe.h"
+#include "application/application.h"
 #include <QtWidgets/QApplication>
 
 int main(int argc, char *argv[])
 {
-	QApplication a(argc, argv);
-	AppSpace::DllInjector w;
-	w.show();
-	return a.exec();
+	Injector::ApplicationController appController(argc, argv);
+	return appController.exec();
 }

@@ -1,200 +1,216 @@
 #include "stdafx.h"
-#include "applicationcontroller.hpp"
-#include "common/common.hpp"
+#include "../widgets/mainframe.h"
+#include "../common/common.h"
+#include "../common/winapihelpers.h"
+#include "applicationcontroller.h"
+#include "injectorlogger.h"
 #include <fstream>
 #include <cstdint>
 #include <windows.h>
 #include <winbase.h>
 
-namespace AppSpace
+namespace Injector
 {
-	void ApplicationController::setSeDebugPrivilege(bool flag)
+
+ApplicationController::ApplicationController(int argc, char** argv, QObject* parent)
+	: QObject(parent)
+	, m_app(argc, argv)
+	, m_mainFrame(new MainFrame)
+	, m_seDebugPrivilege(false)
+{
+	setSeDebugPrivilege(true);
+
+	VERIFY(connect(m_mainFrame.get(), &MainFrame::signal_StartInjection, this, &ApplicationController::slot_OnAboutInject));
+
+	m_mainFrame->show();
+}
+
+int ApplicationController::exec()
+{
+	return m_app.exec();
+}
+
+void ApplicationController::setSeDebugPrivilege(bool flag)
+{
+	HANDLE hThisProcess = ::GetCurrentProcess();
+
+	HANDLE hThisProcessToken = nullptr;
+	if (!::OpenProcessToken(hThisProcess, TOKEN_ADJUST_PRIVILEGES, &hThisProcess))
 	{
-		HANDLE hThisProcess = ::GetCurrentProcess();
-
-		HANDLE hThisProcessToken = nullptr;
-		if (!::OpenProcessToken(hThisProcess, TOKEN_ADJUST_PRIVILEGES, &hThisProcess))
-		{
-			return;
-		}
-
-		TOKEN_PRIVILEGES tokenPrivileges;
-		LUID luid;
-
-		BOOL bLookupResult = 
-			::LookupPrivilegeValue(nullptr, SE_DEBUG_NAME, &luid);
-
-		if (!bLookupResult)
-		{
-			return;
-		}
-
-		tokenPrivileges.PrivilegeCount = 1;
-		tokenPrivileges.Privileges[0].Luid = luid;
-
-		DWORD enableStatus = flag ? SE_PRIVILEGE_ENABLED : SE_PRIVILEGE_REMOVED;
-
-		tokenPrivileges.Privileges[0].Attributes = enableStatus;
-
-		BOOL bAdbjustResult = 
-			::AdjustTokenPrivileges(hThisProcessToken, FALSE, &tokenPrivileges, sizeof(tokenPrivileges), nullptr, nullptr);
-
-		if (!bAdbjustResult || ::GetLastError() == ERROR_NOT_ALL_ASSIGNED)
-		{
-			return;
-		}
-
-		m_seDebugPrivilege = flag;
+		return;
 	}
 
-	bool ApplicationController::seDebugPrivilege() const
+	TOKEN_PRIVILEGES tokenPrivileges;
+	LUID luid;
+
+	BOOL bLookupResult = 
+		::LookupPrivilegeValue(nullptr, SE_DEBUG_NAME, &luid);
+
+	if (!bLookupResult)
 	{
-		return m_seDebugPrivilege;
+		return;
 	}
 
-	void ApplicationController::createRemoteThread(DWORD pid, QString const& pathToDll)
+	tokenPrivileges.PrivilegeCount = 1;
+	tokenPrivileges.Privileges[0].Luid = luid;
+
+	DWORD enableStatus = flag ? SE_PRIVILEGE_ENABLED : SE_PRIVILEGE_REMOVED;
+
+	tokenPrivileges.Privileges[0].Attributes = enableStatus;
+
+	BOOL bAdbjustResult = 
+		::AdjustTokenPrivileges(hThisProcessToken, FALSE, &tokenPrivileges, sizeof(tokenPrivileges), nullptr, nullptr);
+
+	if (!bAdbjustResult || ::GetLastError() == ERROR_NOT_ALL_ASSIGNED)
 	{
-		emit signal_OnAboutLog(QString(80, '-'));
-
-		Common::Win32::Handle injectingProcess = ::OpenProcess(
-			PROCESS_CREATE_THREAD |
-			PROCESS_QUERY_INFORMATION |
-			PROCESS_VM_OPERATION |
-			PROCESS_VM_WRITE |
-			PROCESS_VM_READ,
-			FALSE,
-			pid
-		);
-
-		if (!injectingProcess)
-		{
-			emit signal_OnAboutLog(QString("OpenProcess fails with: %1").arg(::GetLastError()));
-			emit signal_OnAboutLog(QString(80, '-'));
-			return;
-		}
-
-		if (checkImageFileState(pathToDll) == ImageFileState::X64 &&
-			processRunningUnderWOW64(injectingProcess))
-		{
-			emit signal_OnAboutLog("Error: different bits of DLLs and injecting process...");
-			emit signal_OnAboutLog(QString(80, '-'));
-			return;
-		}
-
-		emit signal_OnAboutLog("Process was opened...");
-
-		std::wstring path = pathToDll.toStdWString();
-
-		LPVOID ptrToString = 
-			::VirtualAllocEx(injectingProcess, nullptr, (path.size() + 1) * sizeof(wchar_t), MEM_COMMIT, PAGE_READWRITE);
-
-		if (!ptrToString)
-		{
-			emit signal_OnAboutLog(QString("VirtualAllocEx fails with: %1").arg(::GetLastError()));
-			emit signal_OnAboutLog(QString(80, '-'));
-			return;
-		}
-
-		emit signal_OnAboutLog("Memory for 'path to dll' string allocated to the specified process...");
-
-		if (!::WriteProcessMemory(injectingProcess, ptrToString, path.c_str(), (path.size() + 1) * sizeof(wchar_t), nullptr))
-		{
-			emit signal_OnAboutLog(QString("WriteProcessMemory fails with: %1").arg(::GetLastError()));
-			emit signal_OnAboutLog(QString(80, '-'));
-			return;
-		}
-
-		emit signal_OnAboutLog(QString("'path to dll' string injected to the specified process by %1 address..."));
-
-		PTHREAD_START_ROUTINE startRoutine = 
-			reinterpret_cast<PTHREAD_START_ROUTINE>(::GetProcAddress(::GetModuleHandle(TEXT("kernel32.dll")), "LoadLibraryW"));
-
-		emit signal_OnAboutLog("Injecting...");
-
-		Common::Win32::Handle remoteThread = 
-			::CreateRemoteThread(injectingProcess, nullptr, 0, startRoutine, ptrToString, 0, nullptr);
-
-		if (!remoteThread)
-		{
-			emit signal_OnAboutLog(QString("CreateRemoteThread fails with: %1").arg(::GetLastError()));
-			emit signal_OnAboutLog(QString(80, '-'));
-			return;
-		}
-
-		::WaitForSingleObject(remoteThread, INFINITE);
-
-		emit signal_OnAboutLog(QString("DLL was successful injected by %1 address!"));
-		emit signal_OnAboutLog(QString(80, '-'));
+		return;
 	}
 
-	ApplicationController::ImageFileState ApplicationController::checkImageFileState(QString const& imageFile) const
+	m_seDebugPrivilege = flag;
+}
+
+bool ApplicationController::seDebugPrivilege() const
+{
+	return m_seDebugPrivilege;
+}
+
+void ApplicationController::createRemoteThread(DWORD pid, QString const& pathToDll)
+{
+	InjectorLogger<MainFrame> logger(m_mainFrame.get(), &MainFrame::onAboutLogActions);
+
+	WinApiHelpers::Process process(&logger);
+
+	process.open(pid,
+		PROCESS_CREATE_THREAD |
+		PROCESS_QUERY_INFORMATION |
+		PROCESS_VM_OPERATION |
+		PROCESS_VM_WRITE |
+		PROCESS_VM_READ
+	);
+
+	if (!process)
 	{
-		IMAGE_DOS_HEADER imageDOSHeader;
-		IMAGE_FILE_HEADER imageFileHeader;
-		std::uint32_t peSignature = 0;
-		std::uint16_t bitOfImageFile = 0;
+		return;
+	}
 
-		std::ifstream imageFileStream(imageFile.toStdString(), std::ios_base::binary);
+	if (processRunningUnderWOW64(process) && checkImageFileState(pathToDll) == ImageFileState::X64)
+	{
+		logger("<font color='red'>Error: different bits of DLLs and injecting process...</font>");
+		return;
+	}
 
-		if (!imageFileStream)
-		{
-			return ImageFileState::ErrorSpecifiedImageFileDoesNotExists;
-		}
+	const std::wstring path = pathToDll.toStdWString();
+	const std::size_t sizeOfBytes = (path.size() + 1) * sizeof(wchar_t);
 
-		imageFileStream.read(reinterpret_cast<char*>(&imageDOSHeader), sizeof(imageDOSHeader));
+	LPVOID ptrToString = process.virtualAlloc(nullptr, sizeOfBytes, MEM_COMMIT, PAGE_READWRITE);
 
-		// Check signature of each image file
-		if (imageDOSHeader.e_magic != 0x5A4D)
-		{
-			return ImageFileState::ErrorInvalidDOSSignature;
-		}
+	if (!ptrToString)
+	{
+		return;
+	}
 
-		// go to the first byte of NT header
-		imageFileStream.seekg(static_cast<std::streampos>(imageDOSHeader.e_lfanew));
-		imageFileStream.read(reinterpret_cast<char*>(&peSignature), sizeof(peSignature));
+	if (!process.writeProcessMemory(ptrToString, path.c_str(), sizeOfBytes))
+	{
+		return;
+	}
 
-		if (peSignature != 0x00004550)
-		{
-			return ImageFileState::ErrorInvalidPESignature;
-		}
+	PTHREAD_START_ROUTINE startRoutine = 
+		reinterpret_cast<PTHREAD_START_ROUTINE>(::GetProcAddress(::GetModuleHandle(TEXT("kernel32.dll")), "LoadLibraryW"));
 
-		imageFileStream.read(reinterpret_cast<char*>(&imageFileHeader), sizeof(imageFileHeader));
+	WinApiHelpers::Thread thread = process.createThread(nullptr, 0, startRoutine, ptrToString, 0);
 
-		if (imageFileHeader.SizeOfOptionalHeader == 0)
-		{
-			return ImageFileState::ErrorInvalidOptionalHeaderSize;
-		}
+	if (!thread)
+	{
+		return;
+	}
+
+	thread.wait(INFINITE);
+}
+
+ApplicationController::ImageFileState ApplicationController::checkImageFileState(QString const& imageFile) const
+{
+	IMAGE_DOS_HEADER imageDOSHeader;
+	IMAGE_FILE_HEADER imageFileHeader;
+	std::uint32_t peSignature = 0;
+
+	std::ifstream imageFileStream(imageFile.toStdString(), std::ios_base::binary);
+
+	if (!imageFileStream)
+	{
+		return ImageFileState::ErrorSpecifiedImageFileDoesNotExists;
+	}
+
+	imageFileStream.read(reinterpret_cast<char*>(&imageDOSHeader), sizeof(imageDOSHeader));
+
+	// Check signature of each image file
+	if (imageDOSHeader.e_magic != 0x5A4D)
+	{
+		return ImageFileState::ErrorInvalidDOSSignature;
+	}
+
+	// go to the first byte of NT header
+	imageFileStream.seekg(static_cast<std::streampos>(imageDOSHeader.e_lfanew));
+	imageFileStream.read(reinterpret_cast<char*>(&peSignature), sizeof(peSignature));
+
+	if (peSignature != 0x00004550)
+	{
+		return ImageFileState::ErrorInvalidPESignature;
+	}
+
+	imageFileStream.read(reinterpret_cast<char*>(&imageFileHeader), sizeof(imageFileHeader));
+
+	if (imageFileHeader.SizeOfOptionalHeader == 0)
+	{
+		return ImageFileState::ErrorInvalidOptionalHeaderSize;
+	}
 		
-		if (imageFileHeader.Machine == IMAGE_FILE_MACHINE_I386)
-		{
-			return ImageFileState::X32;
-		}
-
-		if (imageFileHeader.Machine == IMAGE_FILE_MACHINE_AMD64)
-		{
-			return ImageFileState::X64;
-		}
-
-		return ImageFileState::ErrorUndefinedBitOfImageFile;
-	}
-
-	bool ApplicationController::processRunningUnderWOW64(HANDLE hProcess) const
+	if (imageFileHeader.Machine == IMAGE_FILE_MACHINE_I386)
 	{
-		BOOL bResult = FALSE;
-		SYSTEM_INFO sysInfo;
-
-		::IsWow64Process(hProcess, &bResult);
-		::GetNativeSystemInfo(&sysInfo);
-
-		assert(sysInfo.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_INTEL ||
-			sysInfo.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_AMD64);
-
-		if (sysInfo.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_INTEL)
-		{
-			return false;
-		}
-
-		return bResult;
+		return ImageFileState::X32;
 	}
+
+	if (imageFileHeader.Machine == IMAGE_FILE_MACHINE_AMD64)
+	{
+		return ImageFileState::X64;
+	}
+
+	return ImageFileState::ErrorUndefinedBitOfImageFile;
+}
+
+bool ApplicationController::processRunningUnderWOW64(WinApiHelpers::Process const& process) const
+{
+	BOOL bResult = FALSE;
+	SYSTEM_INFO sysInfo;
+
+	::IsWow64Process(process.get(), &bResult);
+	::GetNativeSystemInfo(&sysInfo);
+
+	assert(sysInfo.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_INTEL ||
+		sysInfo.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_AMD64);
+
+	if (sysInfo.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_INTEL)
+	{
+		return false;
+	}
+
+	return bResult;
+}
+
+void ApplicationController::slot_OnAboutInject(InjectionMethod method, DWORD pid, QString const& pathToDll)
+{
+	switch (method)
+	{
+	case ApplicationController::InjectionMethod::CreateRemoteThreadMethod:
+		createRemoteThread(pid, pathToDll);
+		return;
+
+	default:
+		Common::showSimpleNotification(
+			"Error",
+			"Method not implemented",
+			QMessageBox::Critical
+		);
+	}
+}
 
 }

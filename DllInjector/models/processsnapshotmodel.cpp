@@ -1,8 +1,8 @@
 ﻿#include "stdafx.h"
-#include "processsnapshotmodel.hpp"
-#include "common/stringfeatures.hpp"
+#include "processsnapshotmodel.h"
+#include "common/stringfeatures.h"
 
-namespace AppSpace
+namespace Injector
 {
 
 	ProcessSnapshotModel::ProcessSnapshotModel(QObject* parent)

@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "common/common.hpp"
+#include "common/common.h"
 #include <string>
 #include <vector>
 #include <memory>
@@ -9,7 +9,7 @@
 #include <windows.h>
 #include <tlhelp32.h>
 
-namespace AppSpace
+namespace Injector
 {
 
 	class ProcessSnapshotModel : public QAbstractTableModel

@@ -1,10 +1,10 @@
 ﻿#pragma once
 #include "ui_selectprocess.h"
-#include "models/processsnapshotmodel.hpp"
+#include "models/processsnapshotmodel.h"
 #include <QWidget>
 #include <windows.h>
 
-namespace AppSpace
+namespace Injector
 {
 	class SelectProcess : public QWidget
 	{

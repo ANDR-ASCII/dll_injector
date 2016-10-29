@@ -1,9 +1,9 @@
 ﻿#include "stdafx.h"
-#include "selectprocess.hpp"
-#include "common/common.hpp"
-#include "models/processsnapshotmodel.hpp"
+#include "selectprocess.h"
+#include "common/common.h"
+#include "models/processsnapshotmodel.h"
 
-namespace AppSpace
+namespace Injector
 {
 	using namespace Common;
 
