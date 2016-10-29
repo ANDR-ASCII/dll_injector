@@ -10,7 +10,6 @@
 
 namespace Injector
 {
-
 class MainFrame : public QMainWindow
 {
 	Q_OBJECT
@@ -34,7 +33,6 @@ private:
 private:
 	Ui::DllInjectorClass ui;
 	SelectProcess* m_selectProcessWindow;
-	ApplicationController* m_appController;
 };
 
 }
