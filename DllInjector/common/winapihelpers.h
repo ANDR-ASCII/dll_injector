@@ -19,6 +19,11 @@ public:
 		: m_handle(handle)
 	{}
 
+	~Thread()
+	{
+		close();
+	}
+
 	operator bool()
 	{
 		return m_handle;
@@ -36,6 +41,7 @@ public:
 	{
 		if (m_handle)
 		{
+			m_handle = nullptr;
 			::CloseHandle(m_handle);
 		}
 	}
