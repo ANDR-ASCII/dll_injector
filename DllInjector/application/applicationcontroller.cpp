@@ -77,6 +77,7 @@ bool ApplicationController::seDebugPrivilege() const
 void ApplicationController::createRemoteThread(DWORD pid, QString const& pathToDll)
 {
 	InjectorLogger<MainFrame> logger(m_mainFrame.get(), &MainFrame::onAboutLogActions);
+	logger(QString(65, '*'));
 
 	WinApiHelpers::Process process(&logger);
 
@@ -126,6 +127,7 @@ void ApplicationController::createRemoteThread(DWORD pid, QString const& pathToD
 	}
 
 	thread.wait(INFINITE);
+	logger(QString(65, '*'));
 }
 
 ApplicationController::ImageFileState ApplicationController::checkImageFileState(QString const& imageFile) const
@@ -217,7 +219,7 @@ void ApplicationController::slot_OnAboutInject(InjectionMethod method, DWORD pid
 	default:
 		Common::showSimpleNotification(
 			"Error",
-			"Method not implemented",
+			"Unfortunately this method while not implemented",
 			QMessageBox::Critical
 		);
 	}
