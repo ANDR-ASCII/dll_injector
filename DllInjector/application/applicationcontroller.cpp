@@ -93,7 +93,8 @@ void ApplicationController::createRemoteThread(DWORD pid, QString const& pathToD
 		return;
 	}
 
-	if (processRunningUnderWOW64(process) && checkImageFileState(pathToDll) == ImageFileState::X64)
+	if ((checkImageFileState(pathToDll) == ImageFileState::X64 && isProcessX32(process)) ||
+		(checkImageFileState(pathToDll) == ImageFileState::X32 && isProcessX64(process)))
 	{
 		logger("<font color='red'>Error: different bits of DLLs and injecting process...</font>");
 		return;
@@ -177,7 +178,7 @@ ApplicationController::ImageFileState ApplicationController::checkImageFileState
 	return ImageFileState::ErrorUndefinedBitOfImageFile;
 }
 
-bool ApplicationController::processRunningUnderWOW64(WinApiHelpers::Process const& process) const
+bool ApplicationController::isProcessX64(WinApiHelpers::Process const& process) const
 {
 	BOOL bResult = FALSE;
 	SYSTEM_INFO sysInfo;
@@ -185,13 +186,22 @@ bool ApplicationController::processRunningUnderWOW64(WinApiHelpers::Process cons
 	::IsWow64Process(process.get(), &bResult);
 	::GetNativeSystemInfo(&sysInfo);
 
-	assert(sysInfo.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_INTEL ||
-		sysInfo.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_AMD64);
-
-	if (sysInfo.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_INTEL)
+	if (bResult == false && 
+		sysInfo.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_AMD64)
 	{
-		return false;
+		return true;
 	}
+
+	return false;
+}
+
+bool ApplicationController::isProcessX32(WinApiHelpers::Process const& process) const
+{
+	BOOL bResult = FALSE;
+	SYSTEM_INFO sysInfo;
+
+	::IsWow64Process(process.get(), &bResult);
+	::GetNativeSystemInfo(&sysInfo);
 
 	return bResult;
 }

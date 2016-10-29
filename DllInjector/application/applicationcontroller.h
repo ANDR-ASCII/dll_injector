@@ -46,7 +46,8 @@ public:
 	// this function determines whether passed file pe32 or pe32+
 	ImageFileState checkImageFileState(QString const& imageFile) const;
 
-	bool processRunningUnderWOW64(WinApiHelpers::Process const& process) const;
+	bool isProcessX64(WinApiHelpers::Process const& process) const;
+	bool isProcessX32(WinApiHelpers::Process const& process) const;
 
 private Q_SLOTS:
 	void slot_OnAboutInject(InjectionMethod method, DWORD pid, QString const& pathToDll);
