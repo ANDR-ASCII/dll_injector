@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../application/ilogger.h"
+#include <type_traits>
 #include <cassert>
 #include <QString>
 #include <windows.h>
@@ -237,6 +238,9 @@ private:
 	Thread createThreadInternal(F* f, Args&&... args) const
 	{
 		assert((typeid(f) == typeid(&::CreateThread)) || typeid(f) == typeid(&::CreateRemoteThread));
+
+		assert(reinterpret_cast<void*>(f) == reinterpret_cast<void*>(&::CreateThread) ||
+			reinterpret_cast<void*>(f) == reinterpret_cast<void*>(&::CreateRemoteThread));
 
 		return f(std::forward<Args>(args)...);
 	}
