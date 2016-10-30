@@ -48,6 +48,7 @@ void ApplicationController::setSeDebugPrivilege(bool flag)
 
 	if (!bLookupResult)
 	{
+		::CloseHandle(hThisProcessToken);
 		return;
 	}
 

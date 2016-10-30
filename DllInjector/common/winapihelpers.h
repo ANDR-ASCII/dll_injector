@@ -42,8 +42,8 @@ public:
 	{
 		if (m_handle)
 		{
-			m_handle = nullptr;
 			::CloseHandle(m_handle);
+			m_handle = nullptr;
 		}
 	}
 
