@@ -146,6 +146,22 @@ public:
 		return allocAddress;
 	}
 
+	bool virtualFree(LPVOID address, SIZE_T size, DWORD freeType) const
+	{
+		bool result = ::VirtualFreeEx(m_handle, address, size, freeType) != 0;
+		
+		if (result)
+		{
+			log("Virtual memory successful was freed");
+		}
+		else
+		{
+			log("Virtual memory cannot be freed");
+		}
+
+		return result;
+	}
+
 	bool writeProcessMemory(LPVOID baseAddress, LPCVOID buffer, SIZE_T sizeofBytes) const
 	{
 		assert(m_openFlag);

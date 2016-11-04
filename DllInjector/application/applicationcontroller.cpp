@@ -18,7 +18,14 @@ ApplicationController::ApplicationController(int argc, char** argv, QObject* par
 	, m_mainFrame(new MainFrame)
 	, m_seDebugPrivilege(false)
 {
-	setSeDebugPrivilege(true);
+	enableSeDebugNamePrivilege();
+
+	if (!seDebugPrivilege())
+	{
+		Common::showSimpleNotification("Notification", 
+			"Cannot enable SE DEBUG PRIVILEGE, "
+			"try to restart program as administrator");
+	}
 
 	VERIFY(connect(m_mainFrame.get(), &MainFrame::signal_StartInjection, this, &ApplicationController::slot_OnAboutInject));
 
@@ -28,6 +35,16 @@ ApplicationController::ApplicationController(int argc, char** argv, QObject* par
 int ApplicationController::exec()
 {
 	return m_app.exec();
+}
+
+void ApplicationController::enableSeDebugNamePrivilege()
+{
+	setSeDebugPrivilege(true);
+}
+
+void ApplicationController::disableSeDebugNamePrivilege()
+{
+	setSeDebugPrivilege(false);
 }
 
 void ApplicationController::setSeDebugPrivilege(bool flag)
@@ -128,6 +145,8 @@ void ApplicationController::createRemoteThread(DWORD pid, QString const& pathToD
 	}
 
 	thread.wait(INFINITE);
+	process.virtualFree(ptrToString, 0, MEM_RELEASE);
+
 	logger(QString(65, '*'));
 }
 

@@ -37,7 +37,9 @@ public:
 
 	int exec();
 
-	void setSeDebugPrivilege(bool flag);
+	void enableSeDebugNamePrivilege();
+	void disableSeDebugNamePrivilege();
+
 	bool seDebugPrivilege() const;
 
 	// first injection method
@@ -48,6 +50,9 @@ public:
 
 	bool isProcessX64(WinApiHelpers::Process const& process) const;
 	bool isProcessX32(WinApiHelpers::Process const& process) const;
+
+private:
+	void setSeDebugPrivilege(bool flag);
 
 private Q_SLOTS:
 	void slot_OnAboutInject(InjectionMethod method, DWORD pid, QString const& pathToDll);
