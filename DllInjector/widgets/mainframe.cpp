@@ -55,27 +55,23 @@ void MainFrame::slot_RunButtonClicked()
 	bool setWindowsHookExSelected = ui.setWindowsHookExRadioButton->isChecked();
 	bool windowsRegistrySelected = ui.windowsRegistryRadioButton->isChecked();
 
+	DWORD selectedPID = m_selectProcessWindow->selectedProcessID();
+
 	if (createRemoteThreadSelected)
 	{
-		DWORD selectedPID = m_selectProcessWindow->selectedProcessID();
 		emit signal_StartInjection(ApplicationController::InjectionMethod::CreateRemoteThreadMethod, selectedPID, dllName);
-
 		return;
 	}
 
 	if (setWindowsHookExSelected)
 	{
-		DWORD selectedPID = m_selectProcessWindow->selectedProcessID();
 		emit signal_StartInjection(ApplicationController::InjectionMethod::SetWindowsHookExMethod, selectedPID, dllName);
-
 		return;
 	}
 
 	if (windowsRegistrySelected)
 	{
-		DWORD selectedPID = m_selectProcessWindow->selectedProcessID();
 		emit signal_StartInjection(ApplicationController::InjectionMethod::WindowsRegistryMethod, selectedPID, dllName);
-
 		return;
 	}
 

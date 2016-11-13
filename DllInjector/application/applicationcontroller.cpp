@@ -135,7 +135,7 @@ void ApplicationController::createRemoteThread(DWORD pid, QString const& pathToD
 	}
 
 	PTHREAD_START_ROUTINE startRoutine = 
-		reinterpret_cast<PTHREAD_START_ROUTINE>(::GetProcAddress(::GetModuleHandle(TEXT("kernel32.dll")), "LoadLibraryW"));
+		reinterpret_cast<PTHREAD_START_ROUTINE>(::GetProcAddress(::GetModuleHandleW(L"kernel32.dll"), "LoadLibraryW"));
 
 	WinApiHelpers::Thread thread = process.createThread(nullptr, 0, startRoutine, ptrToString, 0);
 

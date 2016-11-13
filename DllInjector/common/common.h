@@ -40,52 +40,6 @@ private:
 	QWidget* m_widget;
 };
 
-namespace Win32
-{
-class Handle
-{
-public:
-	Handle(HANDLE handle)
-		: m_handle(handle)
-	{}
-
-	Handle(Handle const&) = delete;
-
-	Handle(Handle&& other)
-		: m_handle(std::move(other.m_handle))
-	{
-		other.m_handle = nullptr;
-	}
-
-	~Handle()
-	{
-		closeHandle();
-	}
-
-	operator HANDLE()
-	{
-		return m_handle;
-	}
-
-	Handle& operator=(Handle const& other)
-	{
-		closeHandle();
-
-		m_handle = other.m_handle;
-	}
-
-private:
-	void closeHandle() const
-	{
-		if (m_handle)
-		{
-			::CloseHandle(m_handle);
-		}
-	}
-
-private:
-	HANDLE m_handle;
-};
 }
 
 }
