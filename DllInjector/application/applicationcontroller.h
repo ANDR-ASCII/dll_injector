@@ -37,8 +37,8 @@ public:
 
 	int exec();
 
-	void enableSeDebugNamePrivilege();
-	void disableSeDebugNamePrivilege();
+	void enableSeDebugPrivilege();
+	void disableSeDebugPrivilege();
 
 	bool seDebugPrivilege() const;
 

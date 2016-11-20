@@ -2,6 +2,7 @@
 
 #include "../application/ilogger.h"
 #include <type_traits>
+#include <memory>
 #include <cassert>
 #include <QString>
 #include <windows.h>
@@ -188,7 +189,7 @@ public:
 		return bResult;
 	}
 
-	Thread createThread(LPSECURITY_ATTRIBUTES securityAttributes, 
+	std::shared_ptr<Thread> createThread(LPSECURITY_ATTRIBUTES securityAttributes, 
 		SIZE_T stackSize, 
 		LPTHREAD_START_ROUTINE startAddress, 
 		LPVOID parameter, 
@@ -198,18 +199,20 @@ public:
 		
 		if (!m_openFlag)
 		{
-			return Thread(nullptr);
+			return std::make_shared<Thread>(nullptr);
 		}
 		
 		if (m_openedThisProcess)
 		{
-			Thread t = createThreadInternal(::CreateThread, 
+			std::shared_ptr<Thread> t = std::make_shared<Thread>(
+				createThreadInternal(::CreateThread,
 				securityAttributes, 
 				stackSize, 
 				startAddress, 
 				parameter, 
 				creationFlags, 
-				nullptr);
+				nullptr)
+			);
 
 			if (t)
 			{
@@ -219,14 +222,16 @@ public:
 			return t;
 		}
 		
-		Thread t = createThreadInternal(::CreateRemoteThread,
+		std::shared_ptr<Thread> t = std::make_shared<Thread>(
+			createThreadInternal(::CreateRemoteThread,
 			m_handle, 
 			securityAttributes, 
 			stackSize, 
 			startAddress, 
 			parameter, 
 			creationFlags, 
-			nullptr);
+			nullptr)
+		);
 
 		if (t)
 		{
@@ -251,7 +256,7 @@ private:
 	}
 
 	template <typename F, typename... Args>
-	Thread createThreadInternal(F* f, Args&&... args) const
+	HANDLE createThreadInternal(F* f, Args&&... args) const
 	{
 		assert((typeid(f) == typeid(&::CreateThread)) || typeid(f) == typeid(&::CreateRemoteThread));
 

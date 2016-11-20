@@ -18,7 +18,7 @@ ApplicationController::ApplicationController(int argc, char** argv, QObject* par
 	, m_mainFrame(new MainFrame)
 	, m_seDebugPrivilege(false)
 {
-	enableSeDebugNamePrivilege();
+	enableSeDebugPrivilege();
 
 	if (!seDebugPrivilege())
 	{
@@ -37,12 +37,12 @@ int ApplicationController::exec()
 	return m_app.exec();
 }
 
-void ApplicationController::enableSeDebugNamePrivilege()
+void ApplicationController::enableSeDebugPrivilege()
 {
 	setSeDebugPrivilege(true);
 }
 
-void ApplicationController::disableSeDebugNamePrivilege()
+void ApplicationController::disableSeDebugPrivilege()
 {
 	setSeDebugPrivilege(false);
 }
@@ -137,14 +137,14 @@ void ApplicationController::createRemoteThread(DWORD pid, QString const& pathToD
 	PTHREAD_START_ROUTINE startRoutine = 
 		reinterpret_cast<PTHREAD_START_ROUTINE>(::GetProcAddress(::GetModuleHandleW(L"kernel32.dll"), "LoadLibraryW"));
 
-	WinApiHelpers::Thread thread = process.createThread(nullptr, 0, startRoutine, ptrToString, 0);
+	std::shared_ptr<WinApiHelpers::Thread> thread = process.createThread(nullptr, 0, startRoutine, ptrToString, 0);
 
 	if (!thread)
 	{
 		return;
 	}
 
-	thread.wait(INFINITE);
+	thread->wait(3000);
 	process.virtualFree(ptrToString, 0, MEM_RELEASE);
 
 	logger(QString(65, '*'));
@@ -166,7 +166,8 @@ ApplicationController::ImageFileState ApplicationController::checkImageFileState
 	imageFileStream.read(reinterpret_cast<char*>(&imageDOSHeader), sizeof(imageDOSHeader));
 
 	// Check signature of each image file
-	if (imageDOSHeader.e_magic != 0x5A4D)
+	// should be 'MZ' or 0x5A4D (Mark Zbikowski)
+	if (imageDOSHeader.e_magic != IMAGE_DOS_SIGNATURE)
 	{
 		return ImageFileState::ErrorInvalidDOSSignature;
 	}
@@ -175,7 +176,7 @@ ApplicationController::ImageFileState ApplicationController::checkImageFileState
 	imageFileStream.seekg(static_cast<std::streampos>(imageDOSHeader.e_lfanew));
 	imageFileStream.read(reinterpret_cast<char*>(&peSignature), sizeof(peSignature));
 
-	if (peSignature != 0x00004550)
+	if (peSignature != IMAGE_NT_SIGNATURE)
 	{
 		return ImageFileState::ErrorInvalidPESignature;
 	}
