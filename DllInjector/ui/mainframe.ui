@@ -140,6 +140,14 @@ border-radius: 8px;
 border: 1px solid rgb(220, 220, 220);
 width: 250px;
 height: 30px;
+}
+
+QSpinBox
+{
+border-radius: 8px;
+border: 1px solid rgb(220, 220, 220);
+width: 250px;
+height: 30px;
 };</string>
       </property>
       <property name="title">
@@ -330,7 +338,7 @@ cursor: Pointing Hand;
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>
-  <include location="dllinjector.qrc"/>
+  <include location="../Resources/mainframe.qrc"/>
  </resources>
  <connections/>
 </ui>

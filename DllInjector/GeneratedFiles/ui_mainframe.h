@@ -161,6 +161,14 @@ public:
 "border: 1px solid rgb(220, 220, 220);\n"
 "width: 250px;\n"
 "height: 30px;\n"
+"}\n"
+"\n"
+"QSpinBox\n"
+"{\n"
+"border-radius: 8px;\n"
+"border: 1px solid rgb(220, 220, 220);\n"
+"width: 250px;\n"
+"height: 30px;\n"
 "};"));
         verticalLayout_3 = new QVBoxLayout(groupBox_3);
         verticalLayout_3->setSpacing(6);

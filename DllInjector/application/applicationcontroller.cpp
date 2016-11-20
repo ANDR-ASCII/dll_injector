@@ -49,42 +49,30 @@ void ApplicationController::disableSeDebugPrivilege()
 
 void ApplicationController::setSeDebugPrivilege(bool flag)
 {
-	HANDLE hThisProcess = ::GetCurrentProcess();
-
 	HANDLE hThisProcessToken = nullptr;
-	if (!::OpenProcessToken(hThisProcess, TOKEN_ADJUST_PRIVILEGES, &hThisProcess))
+
+	if (::OpenProcessToken(::GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES, &hThisProcessToken))
 	{
-		return;
-	}
+		TOKEN_PRIVILEGES tokenPrivileges;
+		DWORD enableStatus = flag ? SE_PRIVILEGE_ENABLED : 0;
 
-	TOKEN_PRIVILEGES tokenPrivileges;
-	LUID luid;
+		tokenPrivileges.Privileges[0].Attributes = enableStatus;
+		tokenPrivileges.PrivilegeCount = 1;
 
-	BOOL bLookupResult = 
-		::LookupPrivilegeValue(nullptr, SE_DEBUG_NAME, &luid);
+		BOOL bLookupResult =
+			::LookupPrivilegeValue(nullptr, SE_DEBUG_NAME, &tokenPrivileges.Privileges[0].Luid);
 
-	if (!bLookupResult)
-	{
-		::CloseHandle(hThisProcessToken);
-		return;
-	}
+		if (!bLookupResult)
+		{
+			::CloseHandle(hThisProcessToken);
+			return;
+		}
 
-	tokenPrivileges.PrivilegeCount = 1;
-	tokenPrivileges.Privileges[0].Luid = luid;
-
-	DWORD enableStatus = flag ? SE_PRIVILEGE_ENABLED : SE_PRIVILEGE_REMOVED;
-
-	tokenPrivileges.Privileges[0].Attributes = enableStatus;
-
-	BOOL bAdbjustResult = 
 		::AdjustTokenPrivileges(hThisProcessToken, FALSE, &tokenPrivileges, sizeof(tokenPrivileges), nullptr, nullptr);
 
-	if (!bAdbjustResult || ::GetLastError() == ERROR_NOT_ALL_ASSIGNED)
-	{
-		return;
+		m_seDebugPrivilege = (::GetLastError() == ERROR_SUCCESS);
+		::CloseHandle(hThisProcessToken);
 	}
-
-	m_seDebugPrivilege = flag;
 }
 
 bool ApplicationController::seDebugPrivilege() const
