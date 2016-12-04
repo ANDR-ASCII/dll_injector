@@ -17,7 +17,7 @@ class ApplicationController : public QObject
 public:
 	enum ImageFileState
 	{
-		  ErrorInvalidDOSSignature
+		  ErrorInvalidDosSignature
 		, ErrorInvalidPESignature
 		, ErrorInvalidOptionalHeaderSize
 		, ErrorSpecifiedImageFileDoesNotExists

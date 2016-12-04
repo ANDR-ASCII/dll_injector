@@ -1,14 +1,113 @@
 #pragma once
 
-#include "../application/ilogger.h"
+#include "ilogger.h"
 #include <type_traits>
+#include <utility>
 #include <memory>
 #include <cassert>
+#include <cstddef>
 #include <QString>
 #include <windows.h>
 
 namespace WinApiHelpers
 {
+
+class SharedHandle
+{
+public:
+	SharedHandle(HANDLE handle)
+		: m_counter(new std::size_t{ 1 })
+		, m_handle(handle)
+	{ }
+
+	SharedHandle(SharedHandle const& other)
+		: m_counter(other.m_counter)
+		, m_handle(other.m_handle)
+	{
+		++*m_counter;
+	}
+
+	SharedHandle(SharedHandle&& other)
+		: m_counter(other.m_counter)
+		, m_handle(other.m_handle)
+	{
+		other.m_counter = nullptr;
+		other.m_handle = nullptr;
+	}
+
+	~SharedHandle()
+	{
+		reset();
+	}
+
+	operator bool()
+	{
+		return m_handle != nullptr;
+	}
+
+	void reset()
+	{
+		if (m_counter && !(--*m_counter))
+		{
+			m_deleter(m_handle, m_counter);
+		}
+	}
+
+	void reset(HANDLE handle)
+	{
+		reset();
+
+		m_counter = new std::size_t{ 1 };
+		m_handle = handle;
+	}
+
+	std::size_t useCount() const
+	{
+		return *m_counter;
+	}
+
+	bool unique() const
+	{
+		return useCount() == 1;
+	}
+
+	void swap(SharedHandle& other)
+	{
+		std::swap(m_counter, other.m_counter);
+		std::swap(m_handle, other.m_handle);
+	}
+
+	PHANDLE get()
+	{
+		return &m_handle;
+	}
+
+	const HANDLE* get() const
+	{
+		return &m_handle;
+	}
+
+private:
+	struct InternalHandleDeleter
+	{
+		void operator()(HANDLE& handle, std::size_t*& pCounter) const
+		{
+			if (handle)
+			{
+				::CloseHandle(handle);
+				handle = nullptr;
+
+				delete pCounter;
+				pCounter = nullptr;
+			}
+		}
+	};
+
+private:
+	std::size_t* m_counter;
+	HANDLE m_handle;
+	InternalHandleDeleter m_deleter;
+};
 
 // I supply create this object only in Process wrapper
 // already initialized (as open handle)
@@ -17,14 +116,9 @@ namespace WinApiHelpers
 class Thread
 {
 public:
-	Thread(HANDLE handle)
+	Thread(SharedHandle handle)
 		: m_handle(handle)
 	{}
-
-	~Thread()
-	{
-		close();
-	}
 
 	operator bool()
 	{
@@ -35,21 +129,12 @@ public:
 	{
 		if (m_handle)
 		{
-			::WaitForSingleObject(m_handle, ms);
-		}
-	}
-
-	void close()
-	{
-		if (m_handle)
-		{
-			::CloseHandle(m_handle);
-			m_handle = nullptr;
+			::WaitForSingleObject(*m_handle.get(), ms);
 		}
 	}
 
 private:
-	HANDLE m_handle;
+	SharedHandle m_handle;
 };
 
 class Process
@@ -189,7 +274,7 @@ public:
 		return bResult;
 	}
 
-	std::shared_ptr<Thread> createThread(LPSECURITY_ATTRIBUTES securityAttributes, 
+	Thread createThread(LPSECURITY_ATTRIBUTES securityAttributes, 
 		SIZE_T stackSize, 
 		LPTHREAD_START_ROUTINE startAddress, 
 		LPVOID parameter, 
@@ -199,46 +284,46 @@ public:
 		
 		if (!m_openFlag)
 		{
-			return std::make_shared<Thread>(nullptr);
+			return SharedHandle{ nullptr };
 		}
 		
 		if (m_openedThisProcess)
 		{
-			std::shared_ptr<Thread> t = std::make_shared<Thread>(
+			SharedHandle handle{
 				createThreadInternal(::CreateThread,
-				securityAttributes, 
-				stackSize, 
-				startAddress, 
-				parameter, 
-				creationFlags, 
+				securityAttributes,
+				stackSize,
+				startAddress,
+				parameter,
+				creationFlags,
 				nullptr)
-			);
+			};
 
-			if (t)
+			if (handle)
 			{
 				log("Thread successful created");
 			}
 
-			return t;
+			return handle;
 		}
 		
-		std::shared_ptr<Thread> t = std::make_shared<Thread>(
+		SharedHandle handle{
 			createThreadInternal(::CreateRemoteThread,
-			m_handle, 
-			securityAttributes, 
-			stackSize, 
-			startAddress, 
-			parameter, 
-			creationFlags, 
+			m_handle,
+			securityAttributes,
+			stackSize,
+			startAddress,
+			parameter,
+			creationFlags,
 			nullptr)
-		);
+		};
 
-		if (t)
+		if (handle)
 		{
 			log("Remote thread successful created");
 		}
 
-		return t;
+		return handle;
 	}
 private:
 	void log(QString const& log) const

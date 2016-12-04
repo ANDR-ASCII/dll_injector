@@ -125,14 +125,14 @@ void ApplicationController::createRemoteThread(DWORD pid, QString const& pathToD
 	PTHREAD_START_ROUTINE startRoutine = 
 		reinterpret_cast<PTHREAD_START_ROUTINE>(::GetProcAddress(::GetModuleHandleW(L"kernel32.dll"), "LoadLibraryW"));
 
-	std::shared_ptr<WinApiHelpers::Thread> thread = process.createThread(nullptr, 0, startRoutine, ptrToString, 0);
+	WinApiHelpers::Thread thread = process.createThread(nullptr, 0, startRoutine, ptrToString, 0);
 
 	if (!thread)
 	{
 		return;
 	}
 
-	thread->wait(3000);
+	thread.wait(3000);
 	process.virtualFree(ptrToString, 0, MEM_RELEASE);
 
 	logger(QString(65, '*'));
@@ -154,10 +154,10 @@ ApplicationController::ImageFileState ApplicationController::checkImageFileState
 	imageFileStream.read(reinterpret_cast<char*>(&imageDOSHeader), sizeof(imageDOSHeader));
 
 	// Check signature of each image file
-	// should be 'MZ' or 0x5A4D (Mark Zbikowski)
+	// should be 'MZ' or 0x5A4D
 	if (imageDOSHeader.e_magic != IMAGE_DOS_SIGNATURE)
 	{
-		return ImageFileState::ErrorInvalidDOSSignature;
+		return ImageFileState::ErrorInvalidDosSignature;
 	}
 
 	// go to the first byte of NT header
