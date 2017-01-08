@@ -210,6 +210,11 @@ ApplicationController::ImageFileState ApplicationController::checkImageFileState
 	IMAGE_FILE_HEADER imageFileHeader;
 	std::uint32_t peSignature = 0;
 
+	//
+	// Here we need convertion from std::wstring to std::string
+	// Because if user specifies path with Russian characters
+	// The result is invalid path
+	//
 	std::ifstream imageFileStream(
 		Common::StringFeatures::wcharToString(imageFile.toStdWString().c_str()), 
 		std::ios_base::binary
