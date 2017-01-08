@@ -1,9 +1,10 @@
 #include "stdafx.h"
-#include "../widgets/mainframe.h"
-#include "../common/common.h"
-#include "../common/winapihelpers.h"
+#include "widgets/mainframe.h"
+#include "common/common.h"
+#include "common/winapihelpers.h"
 #include "applicationcontroller.h"
 #include "injectorlogger.h"
+#include "common/stringfeatures.h"
 #include <fstream>
 #include <cstdint>
 #include <windows.h>
@@ -132,10 +133,75 @@ void ApplicationController::createRemoteThread(DWORD pid, QString const& pathToD
 		return;
 	}
 
-	thread.wait(3000);
 	process.virtualFree(ptrToString, 0, MEM_RELEASE);
 
+	DWORD remoteThreadExitCode;
+	::GetExitCodeThread(thread.getHandle(), &remoteThreadExitCode);
+
+	if (remoteThreadExitCode == STILL_ACTIVE)
+	{
+		thread.wait(INFINITE);
+		::GetExitCodeThread(thread.getHandle(), &remoteThreadExitCode);
+	}
+
+	if (!remoteThreadExitCode)
+	{
+		logger("<font color='red'>Error: LoadLibrary returned false. DLL was not injected!</font>");
+	}
+	else
+	{
+		logger("LoadLibrary returned true. DLL injected!");
+	}
+		
 	logger(QString(65, '*'));
+}
+
+void ApplicationController::createProcess(QString const& pathToExe, QString const& pathToDll)
+{
+	PROCESS_INFORMATION processInfo;
+	STARTUPINFO startInfo = { sizeof(STARTUPINFO) };
+
+	std::unique_ptr<wchar_t[]> tmpStr{ new wchar_t[pathToExe.size() + 1] };
+	std::wcscpy(tmpStr.get(), pathToExe.toStdWString().c_str());
+
+	InjectorLogger<MainFrame> logger(m_mainFrame.get(), &MainFrame::onAboutLogActions);
+	logger(QString(65, '*'));
+
+	if (checkImageFileState(pathToExe) != checkImageFileState(pathToDll))
+	{
+		logger("<font color='red'>Error: different bits of DLLs and injecting process...</font>");
+		return;
+	}
+
+	BOOL bCreation = ::CreateProcess(
+		nullptr,
+		tmpStr.get(),
+		nullptr,
+		nullptr,
+		FALSE,
+		CREATE_SUSPENDED,
+		nullptr,
+		nullptr,
+		&startInfo,
+		&processInfo
+	);
+
+	if (bCreation)
+	{
+		createRemoteThread(processInfo.dwProcessId, pathToDll);
+
+		::ResumeThread(processInfo.hThread);
+		::CloseHandle(processInfo.hThread);
+
+		logger(QString(65, '*'));
+	}
+	else
+	{
+		Common::showSimpleNotification("Error",
+			"Unfortunately we cannot to run the specified file",
+			QMessageBox::Information
+		);
+	}
 }
 
 ApplicationController::ImageFileState ApplicationController::checkImageFileState(QString const& imageFile) const
@@ -144,7 +210,10 @@ ApplicationController::ImageFileState ApplicationController::checkImageFileState
 	IMAGE_FILE_HEADER imageFileHeader;
 	std::uint32_t peSignature = 0;
 
-	std::ifstream imageFileStream(imageFile.toStdString(), std::ios_base::binary);
+	std::ifstream imageFileStream(
+		Common::StringFeatures::wcharToString(imageFile.toStdWString().c_str()), 
+		std::ios_base::binary
+	);
 
 	if (!imageFileStream)
 	{
@@ -153,14 +222,18 @@ ApplicationController::ImageFileState ApplicationController::checkImageFileState
 
 	imageFileStream.read(reinterpret_cast<char*>(&imageDOSHeader), sizeof(imageDOSHeader));
 
+	//
 	// Check signature of each image file
 	// should be 'MZ' or 0x5A4D
+	//
 	if (imageDOSHeader.e_magic != IMAGE_DOS_SIGNATURE)
 	{
 		return ImageFileState::ErrorInvalidDosSignature;
 	}
 
+	//
 	// go to the first byte of NT header
+	//
 	imageFileStream.seekg(static_cast<std::streampos>(imageDOSHeader.e_lfanew));
 	imageFileStream.read(reinterpret_cast<char*>(&peSignature), sizeof(peSignature));
 
@@ -217,18 +290,22 @@ bool ApplicationController::isProcessX32(WinApiHelpers::Process const& process) 
 	return bResult;
 }
 
-void ApplicationController::slot_OnAboutInject(InjectionMethod method, DWORD pid, QString const& pathToDll)
+void ApplicationController::slot_OnAboutInject(ParametersPackForInject const& pack)
 {
-	switch (method)
+	switch (pack.method)
 	{
-	case ApplicationController::InjectionMethod::CreateRemoteThreadMethod:
-		createRemoteThread(pid, pathToDll);
+	case ApplicationController::CreateRemoteThreadMethod:
+		createRemoteThread(pack.pid, pack.pathToDll);
+		return;
+
+	case ApplicationController::CreateProcessMethod:
+		createProcess(pack.pathToExe, pack.pathToDll);
 		return;
 
 	default:
 		Common::showSimpleNotification(
 			"Error",
-			"Unfortunately this method while not implemented",
+			"Unfortunately this method yet not implemented",
 			QMessageBox::Critical
 		);
 	}

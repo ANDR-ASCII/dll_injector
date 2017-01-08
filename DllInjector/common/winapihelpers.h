@@ -12,6 +12,10 @@
 namespace WinApiHelpers
 {
 
+//
+// behavior like in a shared_ptr
+// but for Windows kernel objects
+//
 class SharedHandle
 {
 public:
@@ -109,10 +113,12 @@ private:
 	InternalHandleDeleter m_deleter;
 };
 
+//
 // I supply create this object only in Process wrapper
 // already initialized (as open handle)
 // and all I need the wait unless it's executes
 // and close it
+//
 class Thread
 {
 public:
@@ -131,6 +137,16 @@ public:
 		{
 			::WaitForSingleObject(*m_handle.get(), ms);
 		}
+	}
+
+	PHANDLE getHandle()
+	{
+		return m_handle.get();
+	}
+
+	const HANDLE* getHandle() const
+	{
+		return m_handle.get();
 	}
 
 private:
@@ -343,8 +359,6 @@ private:
 	template <typename F, typename... Args>
 	HANDLE createThreadInternal(F* f, Args&&... args) const
 	{
-		assert((typeid(f) == typeid(&::CreateThread)) || typeid(f) == typeid(&::CreateRemoteThread));
-
 		assert(reinterpret_cast<void*>(f) == reinterpret_cast<void*>(&::CreateThread) ||
 			reinterpret_cast<void*>(f) == reinterpret_cast<void*>(&::CreateRemoteThread));
 

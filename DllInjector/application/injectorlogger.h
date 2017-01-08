@@ -6,7 +6,7 @@
 namespace Injector
 {
 
-template <typename TObj, typename... Args>
+template <typename TObj>
 class InjectorLogger : public ILogger
 {
 public:

@@ -20,11 +20,12 @@ public:
 	void onAboutLogActions(QString const& str) const;
 
 Q_SIGNALS:
-	void signal_StartInjection(ApplicationController::InjectionMethod, DWORD, QString const&);
+	void signal_StartInjection(ApplicationController::ParametersPackForInject const& pack);
 
 private Q_SLOTS:
 	void slot_RunButtonClicked();
 	void slot_SelectProcess();
+	void slot_ProcessSelectionChanged();
 	void slot_ShowFileDialog();
 
 private:

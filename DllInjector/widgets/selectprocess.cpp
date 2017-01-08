@@ -19,6 +19,7 @@ namespace Injector
 		ui.setupUi(this);
 		ui.processView->setModel(m_model);
 		ui.processView->setAlternatingRowColors(true);
+		ui.processView->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
 
 		VERIFY(connect(ui.selectButton, SIGNAL(clicked()), this, SLOT(slot_SelectProcess())));
 	}

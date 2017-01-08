@@ -62,6 +62,18 @@ padding: 1px;
 }</string>
   </property>
   <widget class="QWidget" name="centralWidget">
+   <property name="minimumSize">
+    <size>
+     <width>443</width>
+     <height>544</height>
+    </size>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>443</width>
+     <height>544</height>
+    </size>
+   </property>
    <layout class="QVBoxLayout" name="verticalLayout_4">
     <item>
      <widget class="QGroupBox" name="groupBox_2">

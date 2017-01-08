@@ -40,6 +40,7 @@ public:
     QGroupBox *groupBox;
     QVBoxLayout *verticalLayout_2;
     QRadioButton *createRemoteThreadRadioButton;
+    QRadioButton *createProcessRadioButton;
     QRadioButton *setWindowsHookExRadioButton;
     QRadioButton *windowsRegistryRadioButton;
     QGroupBox *groupBox_3;
@@ -65,9 +66,9 @@ public:
     {
         if (DllInjectorClass->objectName().isEmpty())
             DllInjectorClass->setObjectName(QStringLiteral("DllInjectorClass"));
-        DllInjectorClass->resize(443, 514);
-        DllInjectorClass->setMinimumSize(QSize(443, 514));
-        DllInjectorClass->setMaximumSize(QSize(443, 514));
+        DllInjectorClass->resize(443, 566);
+        DllInjectorClass->setMinimumSize(QSize(443, 566));
+        DllInjectorClass->setMaximumSize(QSize(443, 566));
         QFont font;
         font.setPointSize(10);
         DllInjectorClass->setFont(font);
@@ -139,6 +140,11 @@ public:
         createRemoteThreadRadioButton->setChecked(true);
 
         verticalLayout_2->addWidget(createRemoteThreadRadioButton);
+
+        createProcessRadioButton = new QRadioButton(groupBox);
+        createProcessRadioButton->setObjectName(QStringLiteral("createProcessRadioButton"));
+
+        verticalLayout_2->addWidget(createProcessRadioButton);
 
         setWindowsHookExRadioButton = new QRadioButton(groupBox);
         setWindowsHookExRadioButton->setObjectName(QStringLiteral("setWindowsHookExRadioButton"));
@@ -283,8 +289,9 @@ public:
         injectOperation->setText(QApplication::translate("DllInjectorClass", "Inject DLL", 0));
         freeOperation->setText(QApplication::translate("DllInjectorClass", "Free DLL", 0));
         groupBox->setTitle(QApplication::translate("DllInjectorClass", "Select the method of Injection", 0));
-        createRemoteThreadRadioButton->setText(QApplication::translate("DllInjectorClass", "Inject using CreateRemoteThread", 0));
-        setWindowsHookExRadioButton->setText(QApplication::translate("DllInjectorClass", "Inject using SetWindowsHookEx", 0));
+        createRemoteThreadRadioButton->setText(QApplication::translate("DllInjectorClass", "Inject using remote thread", 0));
+        createProcessRadioButton->setText(QApplication::translate("DllInjectorClass", "Inject when create process", 0));
+        setWindowsHookExRadioButton->setText(QApplication::translate("DllInjectorClass", "Inject using Windows hooks", 0));
         windowsRegistryRadioButton->setText(QApplication::translate("DllInjectorClass", "Inject using Windows registry", 0));
         groupBox_3->setTitle(QApplication::translate("DllInjectorClass", "Settings", 0));
         selectDllButton->setText(QApplication::translate("DllInjectorClass", "Select DLL", 0));

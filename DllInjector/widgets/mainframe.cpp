@@ -24,7 +24,7 @@ void MainFrame::init()
 	m_selectProcessWindow->setWindowFlags(Qt::Window);
 	m_selectProcessWindow->setWindowIcon(QIcon("icons/Malware-icon.png"));
 
-	VERIFY(connect(ui.selectProcessButton, SIGNAL(clicked()), m_selectProcessWindow, SLOT(show())));
+	VERIFY(connect(ui.selectProcessButton, SIGNAL(clicked()), this, SLOT(slot_ProcessSelectionChanged())));
 
 	VERIFY(connect(ui.runButton, SIGNAL(clicked()), this, SLOT(slot_RunButtonClicked())));
 
@@ -36,6 +36,8 @@ void MainFrame::init()
 void MainFrame::slot_RunButtonClicked()
 {	
 	DisablerWidgetGuard disabler(this);
+
+	ApplicationController::ParametersPackForInject pack;
 
 	QString processName = ui.processNameLineEdit->text();
 	QString dllName = ui.dllNameLineEdit->text();
@@ -51,30 +53,31 @@ void MainFrame::slot_RunButtonClicked()
 		return;
 	}
 
-	bool createRemoteThreadSelected = ui.createRemoteThreadRadioButton->isChecked();
-	bool setWindowsHookExSelected = ui.setWindowsHookExRadioButton->isChecked();
-	bool windowsRegistrySelected = ui.windowsRegistryRadioButton->isChecked();
+	pack.pid = m_selectProcessWindow->selectedProcessID();
+	pack.pathToDll = dllName;
 
-	DWORD selectedPID = m_selectProcessWindow->selectedProcessID();
-
-	if (createRemoteThreadSelected)
+	if (ui.createRemoteThreadRadioButton->isChecked())
 	{
-		emit signal_StartInjection(ApplicationController::InjectionMethod::CreateRemoteThreadMethod, selectedPID, dllName);
-		return;
+		pack.method = ApplicationController::CreateRemoteThreadMethod;
 	}
 
-	if (setWindowsHookExSelected)
+	if (ui.createProcessRadioButton->isChecked())
 	{
-		emit signal_StartInjection(ApplicationController::InjectionMethod::SetWindowsHookExMethod, selectedPID, dllName);
-		return;
+		pack.method = ApplicationController::CreateProcessMethod;
+		pack.pathToExe = ui.processNameLineEdit->text();
 	}
 
-	if (windowsRegistrySelected)
+	if (ui.setWindowsHookExRadioButton->isChecked())
 	{
-		emit signal_StartInjection(ApplicationController::InjectionMethod::WindowsRegistryMethod, selectedPID, dllName);
-		return;
+		pack.method = ApplicationController::SetWindowsHookExMethod;
 	}
 
+	if (ui.windowsRegistryRadioButton->isChecked())
+	{
+		pack.method = ApplicationController::WindowsRegistryMethod;
+	}
+
+	emit signal_StartInjection(pack);
 }
 //------------------------------------------------------------------------------
 void MainFrame::slot_SelectProcess()
@@ -84,6 +87,20 @@ void MainFrame::slot_SelectProcess()
 
 	ui.processNameLineEdit->setText(QString("[%1] %2").arg(selectedPID).arg(selectedProcessName));
 }
+
+void MainFrame::slot_ProcessSelectionChanged()
+{
+	if (ui.createProcessRadioButton->isChecked())
+	{
+		QString dllName = QFileDialog::getOpenFileName(this, "Select executable file", "", "*.exe");
+		ui.processNameLineEdit->setText(dllName);
+	}
+	else
+	{
+		m_selectProcessWindow->show();
+	}
+}
+
 //------------------------------------------------------------------------------
 void MainFrame::slot_ShowFileDialog()
 {
@@ -96,5 +113,5 @@ void MainFrame::onAboutLogActions(QString const& str) const
 	ui.textEdit->append(str);
 }
 
-	//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 }
